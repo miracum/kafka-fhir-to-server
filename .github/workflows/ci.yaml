@@ -151,7 +151,7 @@ jobs:
           node-version: 14
 
       - name: Install semantic release
-        run: |
+        run: >
           npm install -g semantic-release@18
             @semantic-release/github
             @semantic-release/exec
