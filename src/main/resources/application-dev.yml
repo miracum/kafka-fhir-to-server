@@ -1,0 +1,28 @@
+spring:
+  kafka:
+    bootstrapServers: localhost:9092
+  cloud:
+    stream:
+      function.definition: sink
+      bindings:
+        sink-in-0:
+          destination: fhir-msg
+fhir:
+  url: http://localhost:8082/fhir
+  filter:
+    expression: "true"
+  auth:
+    basic:
+      enabled: true
+      username: "test"
+      password: "test"
+
+logging:
+  level:
+    org.miracum: debug
+
+opentracing:
+  jaeger:
+    log-spans: true
+    enabled: true
+    service-name: ${spring.application.name}

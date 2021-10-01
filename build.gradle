@@ -1,0 +1,88 @@
+plugins {
+    id "org.springframework.boot" version "2.5.5"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
+    id "jacoco"
+    id "com.diffplug.spotless" version "5.15.2"
+}
+
+group = "org.miracum.streams"
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = "11"
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set("springCloudVersion", "2020.0.4")
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+
+    implementation "org.springframework.cloud:spring-cloud-stream"
+    implementation "org.springframework.cloud:spring-cloud-stream-binder-kafka"
+    implementation "org.springframework.kafka:spring-kafka"
+
+    implementation "org.apache.kafka:kafka-streams"
+
+    implementation "io.micrometer:micrometer-registry-prometheus:1.7.4"
+    implementation "io.micrometer:micrometer-core:1.7.4"
+
+    implementation "org.miracum:kafka-fhir-serializer:1.0.2"
+
+    implementation "net.logstash.logback:logstash-logback-encoder:6.6"
+
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-base:5.5.1"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-client:5.5.1"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.5.1"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:5.5.1"
+
+    implementation "com.github.ben-manes.caffeine:caffeine:3.0.4"
+
+    implementation "org.fhir:ucum:1.0.3"
+
+    implementation "io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.3.1"
+    implementation "io.opentracing.contrib:opentracing-okhttp3:3.0.0"
+    implementation "io.opentracing.contrib:opentracing-kafka-spring:0.1.15"
+
+    implementation "io.jaegertracing:jaeger-client:1.6.0"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+jar {
+    enabled = false
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.6"
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled true
+    }
+}
+
+spotless {
+    java {
+        importOrder()
+        removeUnusedImports()
+        googleJavaFormat()
+    }
+}

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fhir-to-server
+spec:
+  containers:
+    - name: fhir-to-server
+      image: fhir-to-server
+      resources:
+        limits:
+          memory: 1Gi
+          cpu: 500m
+      env:
+        - name: BOOTSTRAP_SERVERS
+          value: my-cluster-kafka-bootstrap:9093
+        - name: TOPIC
+          value: fhir-msg
+        - name: GROUP_ID
+          value: fhir-to-server
+        - name: DISABLE_AUTO_COMMIT
+          value: "false"
+        - name: FHIR_URL
+          value: http://fhir-server:8080/fhir
+        - name: SECURITY_PROTOCOL
+          value: SSL
+        - name: SSL_KEY_STORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fhir-to-server-user
+              key: user.password
+        - name: SSL_TRUST_STORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-cluster-cluster-ca-cert
+              key: ca.password
+      volumeMounts:
+        - name: cluster-certs
+          mountPath: /opt/kafka-certs/ca.p12
+          subPath: ca.p12
+          readOnly: true
+        - name: user-certs
+          mountPath: /opt/kafka-certs/user.p12
+          subPath: user.p12
+          readOnly: true
+  volumes:
+    - name: cluster-certs
+      secret:
+        secretName: my-cluster-cluster-ca-cert
+    - name: user-certs
+      secret:
+        secretName: fhir-to-server-user
