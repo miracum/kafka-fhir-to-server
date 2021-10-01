@@ -1,0 +1,6 @@
+resource_file,fhir_path_expression                                                                                                                     ,expected_result
+patient.json ,Patient.where(identifier.system='urn:oid:1.2.36.146.595.217.0.1').exists()                                                               ,true
+patient.json ,Patient.where(identifier.system='fhir.example.com').exists()                                                                             ,false
+bundle.json  ,Bundle.entry.resource.where(meta.profile = 'https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Diagnose').exists(),true
+bundle.json  ,Bundle.entry.resource.where(meta.profile.contains('https://www.medizininformatik-initiative.de/fhir/core')).exists()                     ,true
+bundle.json  ,Bundle.entry.resource.where(subject.identifier.system='https://fhir.example.com/NamingSystem/patient-id').exists()                       ,true

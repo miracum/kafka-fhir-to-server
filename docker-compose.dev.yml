@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  fhir:
+    image: hapiproject/hapi:v5.5.0-distroless
+    environment:
+      HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
+      HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
+      HAPI_FHIR_FHIR_VERSION: "R4"
+      HAPI_FHIR_CORS_ALLOWCREDENTIALS: "false"
+      HAPI_FHIR_CORS_ALLOWED_ORIGIN: "*"
+    ports:
+      - 8082:8080
+
+  zoo1:
+    image: zookeeper:3.7.0
+    restart: unless-stopped
+    hostname: zoo1
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+
+  kafka1:
+    image: confluentinc/cp-kafka:6.2.1
+    hostname: kafka1
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - 9092:9092
+    depends_on:
+      - zoo1
+
+  akhq:
+    image: tchiotludo/akhq:0.18.0
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka1:19092"
+    ports:
+      - 9000:8080
+    depends_on:
+      - kafka1
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.26
+    ports:
+      - 16686:16686
+      - 6831:6831/udp
+      - 6832:6832/udp
+
+  mock-data-loader:
+    image: confluentinc/cp-kafkacat:6.2.1
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      [
+        "while true; do kafkacat -b kafka1:19092 -t fhir-msg -P -l /data/mock-data.ndjson; sleep 10; done",
+      ]
+    volumes:
+      - ./hack/mock-data.ndjson:/data/mock-data.ndjson:ro
+    depends_on:
+      - kafka1

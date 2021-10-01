@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fhir-server
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fhir-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fhir-server
+    spec:
+      containers:
+        - name: fhir-server
+          image: docker.io/hapiproject/hapi:v5.5.0-distroless
+          resources:
+            limits:
+              memory: "2Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+              name: fhir-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fhir-server
+spec:
+  selector:
+    app.kubernetes.io/name: fhir-server
+  ports:
+    - port: 8080
+      targetPort: fhir-api

@@ -1,0 +1,710 @@
+{
+  "id": "6ff6cd53-b04a-423b-8949-e8c55c58265b",
+  "entry": [
+    {
+      "fullUrl": "Condition/d3f20d1d-5e23-4c67-8737-0025a22a9e19",
+      "request": {
+        "method": "PUT",
+        "url": "Condition/d3f20d1d-5e23-4c67-8737-0025a22a9e19"
+      },
+      "resource": {
+        "id": "d3f20d1d-5e23-4c67-8737-0025a22a9e19",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Diagnose"
+          ]
+        },
+        "bodySite": [
+          {
+            "coding": [
+              {
+                "code": "24028007",
+                "display": "Right",
+                "system": "http://snomed.info/sct"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "code": "I88.9",
+              "display": "Unspezifische Lymphadenitis",
+              "system": "http://fhir.de/CodeSystem/dimdi/icd-10-gm",
+              "userSelected": false,
+              "version": "2020"
+            }
+          ]
+        },
+        "recordedDate": "2020-11-19T10:01:00+00:00",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "Condition"
+      }
+    },
+    {
+      "fullUrl": "Condition/f6d04d30-1905-4f59-8319-84b69bd7ec00",
+      "request": {
+        "method": "PUT",
+        "url": "Condition/f6d04d30-1905-4f59-8319-84b69bd7ec00"
+      },
+      "resource": {
+        "id": "f6d04d30-1905-4f59-8319-84b69bd7ec00",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Diagnose"
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "D70.7",
+              "display": "Neutropenie",
+              "system": "http://fhir.de/CodeSystem/dimdi/icd-10-gm",
+              "userSelected": false,
+              "version": "2020"
+            }
+          ]
+        },
+        "recordedDate": "2020-11-19T10:01:00+00:00",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "Condition"
+      }
+    },
+    {
+      "fullUrl": "Condition/6e76da93-8316-4440-8ffd-0e9588a40752",
+      "request": {
+        "method": "PUT",
+        "url": "Condition/6e76da93-8316-4440-8ffd-0e9588a40752"
+      },
+      "resource": {
+        "id": "6e76da93-8316-4440-8ffd-0e9588a40752",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Diagnose"
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "D70.7",
+              "display": "Neutropenie",
+              "system": "http://fhir.de/CodeSystem/dimdi/icd-10-gm",
+              "userSelected": false,
+              "version": "2020"
+            }
+          ]
+        },
+        "recordedDate": "2020-11-19T10:01:00+00:00",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "Condition"
+      }
+    },
+    {
+      "fullUrl": "Condition/96d87aee-ff65-4f73-ab66-fc88af20ee8f",
+      "request": {
+        "method": "PUT",
+        "url": "Condition/96d87aee-ff65-4f73-ab66-fc88af20ee8f"
+      },
+      "resource": {
+        "id": "96d87aee-ff65-4f73-ab66-fc88af20ee8f",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Diagnose"
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "B99",
+              "display": "Infektionskrankheit",
+              "system": "http://fhir.de/CodeSystem/dimdi/icd-10-gm",
+              "userSelected": false,
+              "version": "2020"
+            }
+          ]
+        },
+        "recordedDate": "2020-11-19T10:01:00+00:00",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "Condition"
+      }
+    },
+    {
+      "fullUrl": "Device/736bdfe5961ada6638f52f50fea85213bc6e08bac3c5594b249223df9b90b1e6",
+      "request": {
+        "method": "PUT",
+        "url": "Device/736bdfe5961ada6638f52f50fea85213bc6e08bac3c5594b249223df9b90b1e6"
+      },
+      "resource": {
+        "id": "736bdfe5961ada6638f52f50fea85213bc6e08bac3c5594b249223df9b90b1e6",
+        "deviceName": [
+          {
+            "name": "Averbis Health Discovery",
+            "type": "manufacturer-name"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/averbis-health-discovery-device-id",
+            "value": "ahd-v5.35.1"
+          }
+        ],
+        "manufacturer": "Averbis GmbH",
+        "status": "active",
+        "version": [
+          {
+            "value": "5.35.1"
+          }
+        ],
+        "resourceType": "Device"
+      }
+    },
+    {
+      "fullUrl": "MedicationStatement/1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139"
+      },
+      "resource": {
+        "id": "1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/MedicationStatement"
+          ]
+        },
+        "context": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/encounter-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "VN",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Visit number"
+            },
+            "value": "222222222"
+          },
+          "reference": "Encounter/69e1edcd15cb95fecaa7c4cdf855ce8a33e75c071b7627dd15b03ea28fc77788",
+          "type": "Encounter"
+        },
+        "dateAsserted": "2020-11-19T10:01:00+00:00",
+        "effectiveDateTime": "2020-11-19T10:01:00+00:00",
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Cefuroxim_7181004_185194"
+          }
+        ],
+        "medicationReference": {
+          "identifier": {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Cefuroxim"
+          },
+          "reference": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9",
+          "type": "Medication"
+        },
+        "status": "active",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "MedicationStatement"
+      }
+    },
+    {
+      "fullUrl": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9",
+      "request": {
+        "method": "PUT",
+        "url": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9"
+      },
+      "resource": {
+        "id": "070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Medication"
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "J01DC02",
+              "display": "Cefuroxim",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            },
+            {
+              "code": "S01AA27",
+              "display": "Cefuroxim",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            }
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Cefuroxim"
+          }
+        ],
+        "ingredient": [
+          {
+            "itemCodeableConcept": {
+              "coding": [
+                {
+                  "display": "Cefuroxim",
+                  "system": "http://fhir.de/CodeSystem/dimdi/atc"
+                }
+              ]
+            }
+          }
+        ],
+        "resourceType": "Medication"
+      }
+    },
+    {
+      "fullUrl": "MedicationStatement/1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139"
+      },
+      "resource": {
+        "id": "1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/MedicationStatement"
+          ]
+        },
+        "context": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/encounter-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "VN",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Visit number"
+            },
+            "value": "222222222"
+          },
+          "reference": "Encounter/69e1edcd15cb95fecaa7c4cdf855ce8a33e75c071b7627dd15b03ea28fc77788",
+          "type": "Encounter"
+        },
+        "dateAsserted": "2020-11-19T10:01:00+00:00",
+        "effectiveDateTime": "2020-11-19T10:01:00+00:00",
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Cefuroxim_7181004_185194"
+          }
+        ],
+        "medicationReference": {
+          "identifier": {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Cefuroxim"
+          },
+          "reference": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9",
+          "type": "Medication"
+        },
+        "status": "active",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "MedicationStatement"
+      }
+    },
+    {
+      "fullUrl": "MedicationStatement/7efca02a89f27950265bb55482e2d482e42eac66c64eb18d1bb5a8eed5b6b9c7",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/7efca02a89f27950265bb55482e2d482e42eac66c64eb18d1bb5a8eed5b6b9c7"
+      },
+      "resource": {
+        "id": "7efca02a89f27950265bb55482e2d482e42eac66c64eb18d1bb5a8eed5b6b9c7",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/MedicationStatement"
+          ]
+        },
+        "context": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/encounter-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "VN",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Visit number"
+            },
+            "value": "222222222"
+          },
+          "reference": "Encounter/69e1edcd15cb95fecaa7c4cdf855ce8a33e75c071b7627dd15b03ea28fc77788",
+          "type": "Encounter"
+        },
+        "dateAsserted": "2020-11-19T10:01:00+00:00",
+        "effectiveDateTime": "2020-11-19T10:01:00+00:00",
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Clindamycin_7181004_185220"
+          }
+        ],
+        "medicationReference": {
+          "identifier": {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Clindamycin"
+          },
+          "reference": "Medication/f8f09418531cdf8c36c1e73eed5692ad7d2cac6e43a36b8ebb54fa906a60f9b0",
+          "type": "Medication"
+        },
+        "status": "active",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "resourceType": "MedicationStatement"
+      }
+    },
+    {
+      "fullUrl": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9",
+      "request": {
+        "method": "PUT",
+        "url": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9"
+      },
+      "resource": {
+        "id": "070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Medication"
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "J01DC02",
+              "display": "Cefuroxim",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            },
+            {
+              "code": "S01AA27",
+              "display": "Cefuroxim",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            }
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Cefuroxim"
+          }
+        ],
+        "ingredient": [
+          {
+            "itemCodeableConcept": {
+              "coding": [
+                {
+                  "display": "Cefuroxim",
+                  "system": "http://fhir.de/CodeSystem/dimdi/atc"
+                }
+              ]
+            }
+          }
+        ],
+        "resourceType": "Medication"
+      }
+    },
+    {
+      "fullUrl": "Medication/f8f09418531cdf8c36c1e73eed5692ad7d2cac6e43a36b8ebb54fa906a60f9b0",
+      "request": {
+        "method": "PUT",
+        "url": "Medication/f8f09418531cdf8c36c1e73eed5692ad7d2cac6e43a36b8ebb54fa906a60f9b0"
+      },
+      "resource": {
+        "id": "f8f09418531cdf8c36c1e73eed5692ad7d2cac6e43a36b8ebb54fa906a60f9b0",
+        "meta": {
+          "profile": [
+            "https://www.medizininformatik-initiative.de/fhir/core/StructureDefinition/Medication"
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "D10AF01",
+              "display": "Clindamycin",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            },
+            {
+              "code": "G01AA10",
+              "display": "Clindamycin",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            },
+            {
+              "code": "J01FF01",
+              "display": "Clindamycin",
+              "system": "http://fhir.de/CodeSystem/dimdi/atc"
+            }
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://fhir.miracum.org/nlp/identifiers/de-averbis-types-health-medication",
+            "value": "Clindamycin"
+          }
+        ],
+        "ingredient": [
+          {
+            "itemCodeableConcept": {
+              "coding": [
+                {
+                  "display": "Clindamycin",
+                  "system": "http://fhir.de/CodeSystem/dimdi/atc"
+                }
+              ]
+            }
+          }
+        ],
+        "resourceType": "Medication"
+      }
+    },
+    {
+      "fullUrl": "Composition/b5b4ea1d-f37b-4415-b421-0a5143a187ce",
+      "request": {
+        "method": "PUT",
+        "url": "Composition/b5b4ea1d-f37b-4415-b421-0a5143a187ce"
+      },
+      "resource": {
+        "id": "b5b4ea1d-f37b-4415-b421-0a5143a187ce",
+        "author": [
+          {
+            "reference": "Device/736bdfe5961ada6638f52f50fea85213bc6e08bac3c5594b249223df9b90b1e6",
+            "type": "Device"
+          }
+        ],
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "18842-5",
+                "display": "Discharge summary note",
+                "system": "http://loinc.org"
+              }
+            ],
+            "text": "Discharge summary note"
+          },
+          {
+            "coding": [
+              {
+                "code": "K",
+                "system": "https://fhir.example.com/CodeSystem/document-template-name"
+              }
+            ],
+            "text": "K"
+          }
+        ],
+        "date": "2021-03-08T20:21:40.542038",
+        "encounter": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/encounter-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "VN",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Visit number"
+            },
+            "value": "222222222"
+          },
+          "reference": "Encounter/69e1edcd15cb95fecaa7c4cdf855ce8a33e75c071b7627dd15b03ea28fc77788",
+          "type": "Encounter"
+        },
+        "section": [
+          {
+            "entry": [
+              {
+                "reference": "Condition/d3f20d1d-5e23-4c67-8737-0025a22a9e19"
+              },
+              {
+                "reference": "Condition/f6d04d30-1905-4f59-8319-84b69bd7ec00"
+              },
+              {
+                "reference": "Condition/6e76da93-8316-4440-8ffd-0e9588a40752"
+              },
+              {
+                "reference": "Condition/96d87aee-ff65-4f73-ab66-fc88af20ee8f"
+              }
+            ],
+            "title": "Condition"
+          },
+          {
+            "entry": [
+              {
+                "reference": "MedicationStatement/1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139"
+              },
+              {
+                "reference": "MedicationStatement/1a530100d6b6a9b02849249662e4d5f61f6d6b5140f5d347543728817f840139"
+              },
+              {
+                "reference": "MedicationStatement/7efca02a89f27950265bb55482e2d482e42eac66c64eb18d1bb5a8eed5b6b9c7"
+              }
+            ],
+            "title": "MedicationStatement"
+          },
+          {
+            "entry": [
+              {
+                "reference": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9"
+              },
+              {
+                "reference": "Medication/070428636e7dc4db3ccded7ca2ab318f0cbda0bdb6d0961a43c9a0e65cd908e9"
+              },
+              {
+                "reference": "Medication/f8f09418531cdf8c36c1e73eed5692ad7d2cac6e43a36b8ebb54fa906a60f9b0"
+              }
+            ],
+            "title": "Medication"
+          }
+        ],
+        "status": "final",
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.example.com/NamingSystem/patient-id",
+            "type": {
+              "coding": [
+                {
+                  "code": "MR",
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "value": "111111111"
+          },
+          "reference": "Patient/972a858af90f910f254b8c5691f0c522c7447634705709ddb872557c4ef2a784",
+          "type": "Patient"
+        },
+        "title": "NLP FHIR Results 2021-03-08T21:21",
+        "type": {
+          "coding": [
+            {
+              "code": "18842-5",
+              "display": "Discharge summary note",
+              "system": "http://loinc.org"
+            }
+          ],
+          "text": "Discharge summary note"
+        },
+        "resourceType": "Composition"
+      }
+    }
+  ],
+  "type": "transaction",
+  "resourceType": "Bundle"
+}

@@ -1,0 +1,85 @@
+spring:
+  application:
+    name: fhir-to-server
+  profiles:
+    active: dev
+  kafka:
+    bootstrapServers: ${BOOTSTRAP_SERVERS}
+    security.protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
+    ssl:
+      trust-store-type: PKCS12
+      trust-store-location: file://${SSL_TRUST_STORE:/opt/kafka-certs/ca.p12}
+      trust-store-password: ${SSL_TRUST_STORE_PASSWORD}
+      key-store-type: PKCS12
+      key-store-location: file://${SSL_KEY_STORE_FILE:/opt/kafka-certs/user.p12}
+      key-store-password: ${SSL_KEY_STORE_PASSWORD}
+    consumer:
+      properties:
+        fetch.max.wait.ms: ${FETCH_MAX_WAIT_MS:10000}
+        retry.backoff.ms: ${RETRY_BACKOFF_MS:5000}
+        max.poll.records: ${MAX_POLL_RECORDS:500}
+        max.poll.interval.ms: ${MAX_POLL_INTERVAL_MS:300000}
+        request.timeout.ms: ${REQUEST_TIMEOUT_MS:900000}
+  cloud:
+    stream:
+      function.definition: sink
+      bindings:
+        sink-in-0:
+          consumer:
+            concurrency: ${CONSUMER_CONCURRENCY:1}
+          destination: ${TOPIC:fhir-msg}
+          group: ${GROUP_ID:fhir-to-server}
+      kafka:
+        default:
+          consumer:
+            enableDlq: true
+            dlqProducerProperties:
+              configuration:
+                key.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+                value.serializer: org.miracum.kafka.serializers.KafkaFhirSerializer
+        bindings:
+          sink-in-0:
+            consumer:
+              configuration:
+                value.deserializer: org.miracum.kafka.serializers.KafkaFhirDeserializer
+          binder:
+            configuration:
+              max.poll.interval.ms: ${MAX_POLL_INTERVAL_MS:300000}
+              max.poll.records: ${MAX_POLL_RECORDS:500}
+  main:
+    banner-mode: off
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+fhir:
+  filter:
+    expression: ""
+  override-bundle-type-with: ""
+  url: ""
+  auth:
+    basic:
+      enabled: false
+      username: ""
+      password: ""
+
+opentracing:
+  jaeger:
+    log-spans: false
+    enabled: false
+
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m %X %n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
