@@ -1,17 +1,16 @@
 import logging
 import os
+
 import pytest
 import requests
 from fhirclient import client
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-from retrying import retry
-
-from fhirclient.models.observation import Observation
-from fhirclient.models.encounter import Encounter
-from fhirclient.models.patient import Patient
 from fhirclient.models.domainresource import DomainResource
-
+from fhirclient.models.encounter import Encounter
+from fhirclient.models.observation import Observation
+from fhirclient.models.patient import Patient
+from requests.adapters import HTTPAdapter
+from retrying import retry
+from urllib3.util.retry import Retry
 
 EXPECTED_RESOURCE_COUNTS = [
     (Patient, 2),
