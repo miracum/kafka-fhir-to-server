@@ -113,6 +113,19 @@ jobs:
           IMAGES=(${{ steps.docker_meta.outputs.tags }})
           echo "##[set-output name=image_name;]${IMAGES[0]}"
 
+      - name: Run E2E tests
+        env:
+          KAFKA_FHIR_TO_SERVER_IMAGE: "${{ steps.list_images.outputs.image_name }}"
+        run: |
+          docker-compose -p "$GITHUB_JOB-e2e" -f docker-compose.dev.yml -f tests/e2e/docker-compose.yml --project-directory=tests/e2e build
+          docker-compose -p "$GITHUB_JOB-e2e" -f docker-compose.dev.yml -f tests/e2e/docker-compose.yml --project-directory=tests/e2e run test
+
+      - name: Print E2E logs and shutdown
+        if: always()
+        run: |
+          docker-compose -p "$GITHUB_JOB-e2e" -f docker-compose.dev.yml -f tests/e2e/docker-compose.yml logs
+          docker-compose -p "$GITHUB_JOB-e2e" -f docker-compose.dev.yml -f tests/e2e/docker-compose.yml down --volumes --remove-orphans
+
       - name: Install Cosign
         if: ${{ github.event_name != 'pull_request' }}
         uses: sigstore/cosign-installer@main
