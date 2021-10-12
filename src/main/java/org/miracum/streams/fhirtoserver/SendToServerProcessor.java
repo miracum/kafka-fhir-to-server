@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
+import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import io.micrometer.core.instrument.Counter;
@@ -82,6 +83,7 @@ public class SendToServerProcessor {
     retryableExceptions.put(HttpServerErrorException.class, true);
     retryableExceptions.put(ResourceAccessException.class, true);
     retryableExceptions.put(FhirClientConnectionException.class, true);
+    retryableExceptions.put(InternalErrorException.class, true);
     retryableExceptions.put(ResourceNotFoundException.class, false);
     retryableExceptions.put(ResourceVersionConflictException.class, false);
 
