@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   fhir:
-    image: hapiproject/hapi:v5.5.0-distroless
+    image: hapiproject/hapi:v5.5.1-distroless
     environment:
       HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
@@ -52,7 +52,7 @@ services:
       - kafka1
 
   jaeger:
-    image: jaegertracing/all-in-one:1.26
+    image: jaegertracing/all-in-one:1.27
     ports:
       - 16686:16686
       - 6831:6831/udp
