@@ -1,9 +1,9 @@
 plugins {
-    id "org.springframework.boot" version "2.5.5"
+    id "org.springframework.boot" version "2.5.6"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "java"
     id "jacoco"
-    id "com.diffplug.spotless" version "5.17.0"
+    id "com.diffplug.spotless" version "5.17.1"
 }
 
 group = "org.miracum.streams"
@@ -35,10 +35,10 @@ dependencies {
 
     implementation "net.logstash.logback:logstash-logback-encoder:6.6"
 
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-base:5.5.1"
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-client:5.5.1"
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.5.1"
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:5.5.1"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-base:5.5.3"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-client:5.5.3"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.5.3"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:5.5.3"
 
     implementation "com.github.ben-manes.caffeine:caffeine:3.0.4"
 
