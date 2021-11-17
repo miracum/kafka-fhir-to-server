@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   fhir:
-    image: hapiproject/hapi:v5.5.1-distroless
+    image: hapiproject/hapi:v5.5.2-distroless
     environment:
       HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
