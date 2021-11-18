@@ -28,17 +28,17 @@ dependencies {
 
     implementation "org.apache.kafka:kafka-streams"
 
-    implementation "io.micrometer:micrometer-registry-prometheus:1.7.5"
-    implementation "io.micrometer:micrometer-core:1.7.5"
+    implementation "io.micrometer:micrometer-registry-prometheus:1.8.0"
+    implementation "io.micrometer:micrometer-core:1.8.0"
 
     implementation "org.miracum:kafka-fhir-serializer:1.0.2"
 
     implementation "net.logstash.logback:logstash-logback-encoder:7.0"
 
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-base:5.5.3"
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-client:5.5.3"
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.5.3"
-    implementation "ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:5.5.3"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-base:5.6.0"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-client:5.6.0"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.6.0"
+    implementation "ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:5.6.0"
 
     implementation "com.github.ben-manes.caffeine:caffeine:3.0.4"
 
