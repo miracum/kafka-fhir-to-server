@@ -8,14 +8,14 @@ plugins {
 
 group = "org.miracum.streams"
 version = "0.0.1-SNAPSHOT"
-sourceCompatibility = "11"
+sourceCompatibility = "17"
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    set("springCloudVersion", "2020.0.5")
+    set("springCloudVersion", "2021.0.0")
 }
 
 dependencies {
@@ -67,15 +67,11 @@ test {
     useJUnitPlatform()
 }
 
-jacoco {
-    toolVersion = "0.8.6"
-}
-
 jacocoTestReport {
     reports {
-        html.enabled true
-        xml.enabled false
-        csv.enabled true
+        html.required = true
+        xml.required = false
+        csv.required = true
     }
 }
 
