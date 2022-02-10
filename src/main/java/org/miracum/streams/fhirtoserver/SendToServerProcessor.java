@@ -95,7 +95,7 @@ public class SendToServerProcessor {
           public <T, E extends Throwable> void onError(
               RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
             LOG.warn(
-                "Trying to sent resource to FHIR server caused error. {} attempt.",
+                "Trying to sent resource to FHIR server caused error. {} attempt. Error: {}",
                 context.getRetryCount(),
                 throwable);
             sendingFailedCounter.increment();
@@ -115,10 +115,7 @@ public class SendToServerProcessor {
       MDC.put("resourceId", resource.getIdElement().toUnqualifiedVersionless().toString());
       MDC.put("resourceType", resource.getResourceType().name());
 
-      Bundle bundle;
-      if (resource instanceof Bundle) {
-        bundle = (Bundle) resource;
-      } else {
+      if (!(resource instanceof Bundle bundle)) {
         LOG.warn("Can only process resources of type Bundle. Ignoring.");
         unsupportedResourceTypeCounter.increment();
         return;
@@ -135,8 +132,9 @@ public class SendToServerProcessor {
             "Applying FHIR path filter {} to resource", kv("expression", fhirPathFilterExpression));
 
         shouldSend =
-            filterDurationTimer.record(
-                () -> resourceFilter.matches(resource, fhirPathFilterExpression));
+            Boolean.TRUE.equals(
+                filterDurationTimer.record(
+                    () -> resourceFilter.matches(resource, fhirPathFilterExpression)));
 
         if (shouldSend) {
           LOG.debug("FHIR path filter matched");
