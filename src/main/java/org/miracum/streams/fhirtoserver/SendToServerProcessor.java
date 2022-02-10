@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
@@ -95,10 +96,18 @@ public class SendToServerProcessor {
           public <T, E extends Throwable> void onError(
               RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
             LOG.warn(
-                "Trying to sent resource to FHIR server caused error. {} attempt. Error: {}",
+                "Trying to sent resource to FHIR server caused error. {} attempt.",
                 context.getRetryCount(),
                 throwable);
             sendingFailedCounter.increment();
+            if (throwable instanceof BaseServerResponseException fhirException) {
+              var operationOutcome = fhirException.getOperationOutcome();
+              fhirClient
+                  .getFhirContext()
+                  .newJsonParser()
+                  .setPrettyPrint(true)
+                  .encodeResourceToString(operationOutcome);
+            }
           }
         });
   }
