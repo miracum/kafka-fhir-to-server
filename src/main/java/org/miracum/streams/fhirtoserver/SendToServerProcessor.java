@@ -4,6 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
@@ -99,6 +100,15 @@ public class SendToServerProcessor {
                 context.getRetryCount(),
                 throwable);
             sendingFailedCounter.increment();
+            if (throwable instanceof BaseServerResponseException fhirException) {
+              var operationOutcome = fhirException.getOperationOutcome();
+              LOG.warn(
+                  fhirClient
+                      .getFhirContext()
+                      .newJsonParser()
+                      .setPrettyPrint(true)
+                      .encodeResourceToString(operationOutcome));
+            }
           }
         });
   }
@@ -115,10 +125,7 @@ public class SendToServerProcessor {
       MDC.put("resourceId", resource.getIdElement().toUnqualifiedVersionless().toString());
       MDC.put("resourceType", resource.getResourceType().name());
 
-      Bundle bundle;
-      if (resource instanceof Bundle) {
-        bundle = (Bundle) resource;
-      } else {
+      if (!(resource instanceof Bundle bundle)) {
         LOG.warn("Can only process resources of type Bundle. Ignoring.");
         unsupportedResourceTypeCounter.increment();
         return;
@@ -135,8 +142,9 @@ public class SendToServerProcessor {
             "Applying FHIR path filter {} to resource", kv("expression", fhirPathFilterExpression));
 
         shouldSend =
-            filterDurationTimer.record(
-                () -> resourceFilter.matches(resource, fhirPathFilterExpression));
+            Boolean.TRUE.equals(
+                filterDurationTimer.record(
+                    () -> resourceFilter.matches(resource, fhirPathFilterExpression)));
 
         if (shouldSend) {
           LOG.debug("FHIR path filter matched");
