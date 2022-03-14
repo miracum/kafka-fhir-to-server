@@ -12,7 +12,7 @@ RUN gradle --no-daemon --info build && \
     awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' build/reports/jacoco/test/jacocoTestReport.csv && \
     java -Djarmode=layertools -jar build/libs/*.jar extract
 
-FROM gcr.io/distroless/java17-debian11@sha256:2f80f7a0b18d2b54fbe806d89740239812bc061c61726403f5142f04c576790a
+FROM gcr.io/distroless/java17-debian11@sha256:05d8b2c3dfdf84eae155c0a8b40b5f8ded62f4d19517b27ae164dc0a63da4f54
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/src/dependencies/ ./
 COPY --from=build /home/gradle/src/snapshot-dependencies/ ./
