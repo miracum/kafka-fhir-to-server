@@ -131,6 +131,17 @@ public class SendToServerProcessor {
         return;
       }
 
+      MDC.put(
+          "bundleFirstEntryId",
+          bundle
+              .getEntryFirstRep()
+              .getResource()
+              .getIdElement()
+              .toUnqualifiedVersionless()
+              .toString());
+      MDC.put(
+          "bundleFirstEntryType", bundle.getEntryFirstRep().getResource().getResourceType().name());
+
       if (overrideBundleType != null) {
         bundle.setType(overrideBundleType);
       }
