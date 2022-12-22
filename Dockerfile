@@ -1,4 +1,4 @@
-FROM gradle:7.3.3-jdk17 AS build
+FROM gradle:7.6.0-jdk17 AS build
 WORKDIR /home/gradle/src
 ENV GRADLE_USER_HOME /gradle
 
