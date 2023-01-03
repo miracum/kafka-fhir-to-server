@@ -1,5 +1,7 @@
 # FHIR to Server
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/miracum/kafka-fhir-to-server/badge)](https://api.securityscorecards.dev/projects/github.com/miracum/kafka-fhir-to-server)
+
 > Reads FHIR Bundles from a Kafka topic and sends them to a FHIR server
 
 Works great with the [MIRACUM Stream Processors chart](https://github.com/miracum/charts/tree/master/charts/stream-processors)!
@@ -45,12 +47,12 @@ docker-compose -f docker-compose.dev.yml up
 
 ```sh
 helm repo add strimzi https://strimzi.io/charts/
-helm repo update
 helm install strimzi-operator strimzi/strimzi-kafka-operator
 ```
 
-#### Create a cluster with TLS auth support, a FHIR server and launch the fhir-to-server deployment
+#### Create a Kafka cluster with TLS auth support, a FHIR server and launch the fhir-to-server deployment
 
 ```sh
+kind create cluster
 skaffold dev
 ```

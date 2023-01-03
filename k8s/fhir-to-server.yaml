@@ -3,13 +3,44 @@ kind: Pod
 metadata:
   name: fhir-to-server
 spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   containers:
     - name: fhir-to-server
-      image: fhir-to-server
+      image: ghcr.io/miracum/fhir-to-server:v1.1.3
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        privileged: false
+        runAsGroup: 65532
+        runAsUser: 65532
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       resources:
         limits:
           memory: 1Gi
-          cpu: 500m
+          cpu: 1000m
+        requests:
+          memory: 1Gi
+          cpu: 1000m
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+      livenessProbe:
+        httpGet:
+          path: /actuator/health/liveness
+          port: http
+      readinessProbe:
+        httpGet:
+          path: /actuator/health/readiness
+          port: http
       env:
         - name: BOOTSTRAP_SERVERS
           value: my-cluster-kafka-bootstrap:9093

@@ -10,6 +10,9 @@ on:
 
 permissions: read-all
 
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
 jobs:
   trivy:
     name: Trivy scan Code Base
@@ -42,6 +45,8 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       image-tags: ${{ steps.container_meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-name: ${{ env.IMAGE_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3
@@ -60,7 +65,7 @@ jobs:
         uses: docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea # v4
         with:
           images: |
-            ghcr.io/${{ github.repository }}
+            ${{ env.IMAGE_NAME }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2
@@ -74,22 +79,22 @@ jobs:
         id: platforms
         run: |
           if [ "$IS_PULL_REQUEST" == "true" ]; then
-            echo "::set-output name=platforms::linux/amd64"
+            echo "{platforms}={linux/amd64}" >> "$GITHUB_OUTPUT"
           else
-            echo "::set-output name=platforms::linux/amd64"
+            echo "{platforms}={linux/amd64}" >> "$GITHUB_OUTPUT"
           fi
         env:
           IS_PULL_REQUEST: ${{ github.event_name == 'pull_request' }}
 
       - name: Build and push
-        id: docker_build
+        id: build
         uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5 # v3
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          tags: ${{ steps.container_meta.outputs.tags }}
+          labels: ${{ steps.container_meta.outputs.labels }}
           load: ${{ github.event_name == 'pull_request' }}
           platforms: ${{ steps.platforms.outputs.platforms }}
 
@@ -142,6 +147,24 @@ jobs:
             echo "Signing '$image' using keyless approach"
             cosign sign "$image"
           done <<< "$IMAGES"
+
+  container-provenance:
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs:
+      - build
+    permissions:
+      actions: read # for detecting the Github Actions environment.
+      id-token: write # for creating OIDC tokens for signing.
+      packages: write # for uploading attestations.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.4.0
+    with:
+      image: ${{ needs.build.outputs.image-tags }}
+      digest: ${{ needs.build.outputs.image-digest }}
+      registry-username: ${{ github.actor }}
+      # TODO(https://github.com/slsa-framework/slsa-github-generator/issues/492): Remove after GA release.
+      compile-generator: true
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     needs: build
