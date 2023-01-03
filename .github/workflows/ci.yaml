@@ -43,6 +43,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-22.04
+    permissions:
+      packages: write
     outputs:
       image-tags: ${{ steps.container_meta.outputs.tags }}
       image-digest: ${{ steps.build.outputs.digest }}
@@ -124,7 +126,6 @@ jobs:
     needs:
       - build
     permissions:
-      contents: read
       id-token: write
       packages: write
     steps:
