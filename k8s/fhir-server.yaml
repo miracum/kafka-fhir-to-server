@@ -11,16 +11,43 @@ spec:
       labels:
         app.kubernetes.io/name: fhir-server
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: fhir-server
-          image: docker.io/hapiproject/hapi:v5.5.0-distroless
+          image: docker.io/hapiproject/hapi:v6.2.2@sha256:9c4e8af94d81ac0049dbb589e4cd855bf78c9c13be6f6844e814c63d63545b44
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsGroup: 65532
+            runAsUser: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
           resources:
             limits:
               memory: "2Gi"
               cpu: "500m"
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
           ports:
             - containerPort: 8080
-              name: fhir-api
+              name: http
 ---
 apiVersion: v1
 kind: Service
@@ -31,4 +58,4 @@ spec:
     app.kubernetes.io/name: fhir-server
   ports:
     - port: 8080
-      targetPort: fhir-api
+      targetPort: http

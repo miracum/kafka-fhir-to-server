@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   fhir:
-    image: hapiproject/hapi:v5.6.0-distroless
+    image: docker.io/hapiproject/hapi:v6.2.2
     environment:
       HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
@@ -13,7 +13,7 @@ services:
       - 8082:8080
 
   zoo1:
-    image: zookeeper:3.7.0
+    image: docker.io/library/zookeeper:3.8.0
     restart: unless-stopped
     hostname: zoo1
     environment:
@@ -22,7 +22,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181
 
   kafka1:
-    image: confluentinc/cp-kafka:7.0.1
+    image: docker.io/confluentinc/cp-kafka:7.3.1
     hostname: kafka1
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
@@ -38,7 +38,7 @@ services:
       - zoo1
 
   akhq:
-    image: tchiotludo/akhq:0.20.0
+    image: docker.io/tchiotludo/akhq:0.23.0
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -52,14 +52,14 @@ services:
       - kafka1
 
   jaeger:
-    image: jaegertracing/all-in-one:1.30
+    image: docker.io/jaegertracing/all-in-one:1.40
     ports:
       - 16686:16686
       - 6831:6831/udp
       - 6832:6832/udp
 
   mock-data-loader:
-    image: confluentinc/cp-kafkacat:7.0.1
+    image: docker.io/confluentinc/cp-kafkacat:7.1.5
     entrypoint: ["/bin/bash", "-c"]
     restart: on-failure
     command:

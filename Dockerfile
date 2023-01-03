@@ -1,4 +1,4 @@
-FROM gradle:7.3.3-jdk17 AS build
+FROM docker.io/library/gradle:7.6.0-jdk17@sha256:9073fad2045e28b86d2d1669bc219739a84771635f033aed0fa293835dd5fad0 AS build
 WORKDIR /home/gradle/src
 ENV GRADLE_USER_HOME /gradle
 
@@ -12,19 +12,16 @@ RUN gradle --no-daemon --info build && \
     awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' build/reports/jacoco/test/jacocoTestReport.csv && \
     java -Djarmode=layertools -jar build/libs/*.jar extract
 
-FROM gcr.io/distroless/java17-debian11@sha256:05d8b2c3dfdf84eae155c0a8b40b5f8ded62f4d19517b27ae164dc0a63da4f54
+FROM gcr.io/distroless/java17-debian11@sha256:d63a18874dfa67da581981cfab840bb5ef637b2d9e5f6d8cfaa9895b0ba7fe7d
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/src/dependencies/ ./
 COPY --from=build /home/gradle/src/snapshot-dependencies/ ./
 COPY --from=build /home/gradle/src/spring-boot-loader/ ./
 COPY --from=build /home/gradle/src/application/ .
 
-USER 65532
+USER 65532:65532
+EXPOSE 8080/tcp
 ARG VERSION=0.0.0
 ENV APP_VERSION=${VERSION} \
     SPRING_PROFILES_ACTIVE=prod
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=80", "org.springframework.boot.loader.JarLauncher"]
-
-ARG GIT_REF=""
-ARG BUILD_TIME=""
-LABEL maintainer="miracum.org"
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
