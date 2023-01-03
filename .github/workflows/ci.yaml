@@ -142,11 +142,12 @@ jobs:
       - name: Sign image
         env:
           IMAGES: ${{ needs.build.outputs.image-tags }}
+          DIGEST: ${{ needs.build.outputs.image-digest }}
           COSIGN_EXPERIMENTAL: "true"
         run: |
           while read -r image; do
             echo "Signing '$image' using keyless approach"
-            cosign sign "$image"
+            cosign sign "$image@$DIGEST"
           done <<< "$IMAGES"
 
   container-provenance:
