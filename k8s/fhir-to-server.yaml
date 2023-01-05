@@ -64,6 +64,8 @@ spec:
             secretKeyRef:
               name: my-cluster-cluster-ca-cert
               key: ca.password
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:MaxRAMPercentage=50 -XX:G1PeriodicGCInterval=1000 -XX:G1PeriodicGCSystemLoadThreshold=1000"
       volumeMounts:
         - name: cluster-certs
           mountPath: /opt/kafka-certs/ca.p12
