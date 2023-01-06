@@ -3,11 +3,38 @@ kind: Config
 metadata:
   name: fhir-to-server
 build:
+  local:
+    concurrency: 1
+    tryImportMissing: false
+    useDockerCLI: true
+    push: false
+    useBuildkit: true
   artifacts:
-    - image: ghcr.io/miracum/fhir-to-server
+    - image: ghcr.io/miracum/kafka-fhir-to-server
+      docker:
+        dockerfile: Dockerfile
+        noCache: false
+        pullParent: false
+        squash: false
       context: .
 manifests:
-  rawYaml:
-    - k8s/*.yaml
+  helm:
+    releases:
+      - name: hapi-fhir-jpaserver
+        remoteChart: hapi-fhir-jpaserver
+        repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter
+        version: 0.11.0
+        skipBuildDependencies: true
+        wait: true
+        setValues:
+          postgresql.auth.postgresPassword: fhir
+      - name: stream-processors
+        remoteChart: stream-processors
+        repo: https://miracum.github.io/charts
+        version: 1.1.8
+        skipBuildDependencies: true
+        wait: true
+        valuesFiles:
+          - "k8s/stream-processors-values.yaml"
 deploy:
-  kubectl: {}
+  helm: {}

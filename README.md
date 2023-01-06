@@ -43,16 +43,22 @@ docker-compose -f docker-compose.dev.yml up
 
 ### Kubernetes
 
-#### Install Strimzi
-
-```sh
-helm repo add strimzi https://strimzi.io/charts/
-helm install strimzi-operator strimzi/strimzi-kafka-operator
-```
-
-#### Create a Kafka cluster with TLS auth support, a FHIR server and launch the fhir-to-server deployment
+#### Create a local KinD cluster
 
 ```sh
 kind create cluster
+```
+
+#### Prerequisite: Install Strimzi & Kafka
+
+```sh
+helm repo add strimzi https://strimzi.io/charts/
+helm install strimzi-kafka-operator strimzi/strimzi-kafka-operator
+kubectl apply -f k8s/kafka-cluster.yaml
+```
+
+#### Install a FHIR server and launch the fhir-to-server deployment
+
+```sh
 skaffold dev
 ```
