@@ -1,0 +1,34 @@
+strimziClusterName: my-cluster
+
+processors:
+  fhir-to-server:
+    replicaCount: 1
+    container:
+      image:
+        registry: ghcr.io
+        repository: miracum/kafka-fhir-to-server
+        tag: v1.1.7
+        pullPolicy: IfNotPresent
+      env:
+        - name: FHIR_URL
+          value: http://hapi-fhir-jpaserver:8080/fhir
+        - name: DISABLE_AUTO_COMMIT
+          value: "false"
+        - name: TOPIC
+          value: fhir-msg
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:MaxRAMPercentage=50 -XX:G1PeriodicGCInterval=1000 -XX:G1PeriodicGCSystemLoadThreshold=1000"
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "1Gi"
+      livenessProbe:
+        httpGet:
+          path: /actuator/health/liveness
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /actuator/health/readiness
+          port: 8080
