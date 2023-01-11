@@ -25,3 +25,5 @@ GROOVY_NPM_GROOVY_LINT_ARGUMENTS:
 REPOSITORY_TRIVY_ARGUMENTS:
   - "--severity=MEDIUM,HIGH,CRITICAL"
   - "--ignore-unfixed"
+
+JAVA_CHECKSTYLE_CONFIG_FILE: .checkstyle/checkstyle.xml
