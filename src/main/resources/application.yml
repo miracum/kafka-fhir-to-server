@@ -75,7 +75,6 @@ fhir:
       enabled: false
       username: ""
       password: ""
-  httpTimeoutSeconds: ${HTTP_TIMEOUT_S:60}
 
 opentracing:
   jaeger:

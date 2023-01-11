@@ -26,9 +26,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class Config {
-  @Value("${fhir.httpTimeoutSeconds}")
-  int timeout;
-
   @Bean
   public FhirContext fhirContext() {
     var fhirContext = FhirContext.forR4();
@@ -57,10 +54,10 @@ public class Config {
         new OkHttpClient.Builder()
             .addInterceptor(tracingInterceptor)
             .addNetworkInterceptor(tracingInterceptor)
-            .callTimeout(Duration.ofSeconds(timeout))
-            .connectTimeout(Duration.ofSeconds(timeout))
-            .readTimeout(Duration.ofSeconds(timeout))
-            .writeTimeout(Duration.ofSeconds(timeout))
+            .callTimeout(Duration.ofSeconds(60))
+            .connectTimeout(Duration.ofSeconds(60))
+            .readTimeout(Duration.ofSeconds(60))
+            .writeTimeout(Duration.ofSeconds(60))
             .build();
 
     var okHttpFactory = new OkHttpRestfulClientFactory(fhirContext);
