@@ -102,12 +102,14 @@ public class SendToServerProcessor {
             sendingFailedCounter.increment();
             if (throwable instanceof BaseServerResponseException fhirException) {
               var operationOutcome = fhirException.getOperationOutcome();
-              LOG.warn(
-                  fhirClient
-                      .getFhirContext()
-                      .newJsonParser()
-                      .setPrettyPrint(true)
-                      .encodeResourceToString(operationOutcome));
+              if (operationOutcome != null) {
+                LOG.warn(
+                    fhirClient
+                        .getFhirContext()
+                        .newJsonParser()
+                        .setPrettyPrint(true)
+                        .encodeResourceToString(operationOutcome));
+              }
             }
           }
         });
