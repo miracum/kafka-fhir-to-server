@@ -15,6 +15,7 @@ spring:
       key-store-password: ${SSL_KEY_STORE_PASSWORD}
     consumer:
       properties:
+        allow.auto.create.topics: ${AUTO_CREATE_TOPICS:false}
         fetch.max.wait.ms: ${FETCH_MAX_WAIT_MS:10000}
         retry.backoff.ms: ${RETRY_BACKOFF_MS:5000}
         max.poll.records: ${MAX_POLL_RECORDS:500}
