@@ -20,6 +20,14 @@ build:
 manifests:
   helm:
     releases:
+      - name: akhq
+        remoteChart: akhq
+        repo: https://akhq.io/
+        version: 0.3.1
+        skipBuildDependencies: true
+        wait: true
+        valuesFiles:
+          - "k8s/akhq-values.yaml"
       - name: hapi-fhir-jpaserver
         remoteChart: hapi-fhir-jpaserver
         repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter
