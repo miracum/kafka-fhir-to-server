@@ -43,7 +43,7 @@ services:
       AKHQ_CONFIGURATION: |
         akhq:
           connections:
-            docker-kafka-server:
+            kafka1:
               properties:
                 bootstrap.servers: "kafka1:19092"
     ports:
