@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.2'
+    id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
     id 'jacoco'
-    id 'com.diffplug.spotless' version '6.12.1'
+    id 'com.diffplug.spotless' version '6.19.0'
     // id 'org.graalvm.buildtools.native' version '0.9.18'
 }
 
@@ -22,7 +22,7 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', '2022.0.1')
+    set('springCloudVersion', '2022.0.3')
 }
 
 dependencies {
@@ -35,19 +35,19 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.10.2'
-    implementation 'io.micrometer:micrometer-core:1.10.2'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.0'
+    implementation 'io.micrometer:micrometer-core:1.11.0'
 
     implementation 'org.miracum:kafka-fhir-serializer:1.0.3'
 
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
 
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.2.2'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-client:6.2.2'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.2.2'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:6.2.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.6.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-client:6.6.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.6.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:6.6.0'
 
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.2'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
 
     implementation 'org.fhir:ucum:1.0.3'
 
