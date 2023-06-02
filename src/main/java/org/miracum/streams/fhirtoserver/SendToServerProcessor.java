@@ -133,16 +133,13 @@ public class SendToServerProcessor {
         return;
       }
 
-      MDC.put(
-          "bundleFirstEntryId",
-          bundle
-              .getEntryFirstRep()
-              .getResource()
-              .getIdElement()
-              .toUnqualifiedVersionless()
-              .toString());
-      MDC.put(
-          "bundleFirstEntryType", bundle.getEntryFirstRep().getResource().getResourceType().name());
+      var firstEntryResource = bundle.getEntryFirstRep().getResource();
+      if (firstEntryResource != null) {
+        MDC.put(
+            "bundleFirstEntryId",
+            firstEntryResource.getIdElement().toUnqualifiedVersionless().toString());
+        MDC.put("bundleFirstEntryType", firstEntryResource.getResourceType().name());
+      }
 
       if (overrideBundleType != null) {
         bundle.setType(overrideBundleType);
