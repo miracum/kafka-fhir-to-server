@@ -135,15 +135,16 @@ public class SendToServerProcessor {
 
       if (((Bundle) resource).hasEntry()) {
         MDC.put(
-          "bundleFirstEntryId",
-          bundle
-            .getEntryFirstRep()
-            .getResource()
-            .getIdElement()
-            .toUnqualifiedVersionless()
-            .toString());
+            "bundleFirstEntryId",
+            bundle
+                .getEntryFirstRep()
+                .getResource()
+                .getIdElement()
+                .toUnqualifiedVersionless()
+                .toString());
         MDC.put(
-          "bundleFirstEntryType", bundle.getEntryFirstRep().getResource().getResourceType().name());
+            "bundleFirstEntryType",
+            bundle.getEntryFirstRep().getResource().getResourceType().name());
       }
 
       if (overrideBundleType != null) {
