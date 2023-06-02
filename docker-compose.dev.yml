@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   fhir:
-    image: docker.io/hapiproject/hapi:v6.2.2@sha256:9c4e8af94d81ac0049dbb589e4cd855bf78c9c13be6f6844e814c63d63545b44
+    image: docker.io/hapiproject/hapi:v6.6.0@sha256:c00367865ae5dad4e171cbb68bfc1c39818854079d1565bee4c86a45e78335d0
     environment:
       HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
@@ -13,7 +13,7 @@ services:
       - 8082:8080
 
   zoo1:
-    image: docker.io/library/zookeeper:3.8.0@sha256:907227c11e8ad438abc3d8d8c545d006862274a2014756f3eb61c20eb80a33b0
+    image: docker.io/library/zookeeper:3.8.1@sha256:c57913ca16e9753417401eea0ffeb4f2914b17b595fcac53b98ad620ab5665d4
     restart: unless-stopped
     hostname: zoo1
     environment:
@@ -22,7 +22,7 @@ services:
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181
 
   kafka1:
-    image: docker.io/confluentinc/cp-kafka:7.3.1@sha256:92f3fbd7693fd50858b798114b4886cd36bf51793f54059620c68ba4d97f8f8e
+    image: docker.io/confluentinc/cp-kafka:7.4.0@sha256:187dac6627e7906c350f5f8c982f80ce735ff1a0e571a20de6000a309a12ce63
     hostname: kafka1
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
@@ -38,7 +38,7 @@ services:
       - zoo1
 
   akhq:
-    image: docker.io/tchiotludo/akhq:0.23.0@sha256:6beade9f8c3fe19d76bebeb525a20d005cfe75fdc2e7b4df7847a1a8085e2d2d
+    image: docker.io/tchiotludo/akhq:0.24.0@sha256:6ccf8323ae6e93a893107f857cd9f7210add3569743b2c8528c6567967cc636f
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -52,14 +52,14 @@ services:
       - kafka1
 
   jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.40@sha256:fa8c1fc551ac31e161a7f729dbaf17e46aaccb0dbd5fbd772aeeb209802cb2a0
+    image: docker.io/jaegertracing/all-in-one:1.45@sha256:5d5c9d2d8c8cbb42f1db4aac1f1f8487bac63da6802004d0da8580fc0c7311a1
     ports:
       - 16686:16686
       - 6831:6831/udp
       - 6832:6832/udp
 
   mock-data-loader:
-    image: docker.io/confluentinc/cp-kafkacat:7.1.5@sha256:bd7efa265abe3f8fc31d2e812b9237cc08b1839bfd14b2a818de5b2ce869d9be
+    image: docker.io/confluentinc/cp-kafkacat:7.1.7@sha256:78b5a1a1702244e12ba17d205e908c722b9fc66596af737a2263d7d88cad0867
     entrypoint: ["/bin/bash", "-c"]
     restart: on-failure
     command:
