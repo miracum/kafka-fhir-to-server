@@ -133,7 +133,7 @@ public class SendToServerProcessor {
         return;
       }
 
-      if (((Bundle) resource).hasEntry()) {
+      if (bundle.hasEntry()) {
         MDC.put(
             "bundleFirstEntryId",
             bundle
