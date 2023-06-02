@@ -1,20 +1,21 @@
-version: "3.9"
-
 services:
   kafka-fhir-to-server:
     image: ${KAFKA_FHIR_TO_SERVER_IMAGE:-ghcr.io/miracum/kafka-fhir-to-server:latest}
     environment:
       FHIR_URL: http://fhir:8080/fhir
-      BOOTSTRAP_SERVERS: "kafka1:19092"
+      BOOTSTRAP_SERVERS: "kafka:9092"
     depends_on:
       - fhir
-      - kafka1
+      - kafka
 
   test:
     build: .
     environment:
       FHIR_SERVER_URL: "http://fhir:8080/fhir"
     depends_on:
-      - fhir
-      - kafka-fhir-to-server
-      - mock-data-loader
+      fhir:
+        condition: service_started
+      kafka-fhir-to-server:
+        condition: service_started
+      mock-data-loader:
+        condition: service_started

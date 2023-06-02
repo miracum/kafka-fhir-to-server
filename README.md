@@ -34,7 +34,7 @@ The application publishes useful Prometheus metrics at `/actuator/prometheus`. T
 ### Setup Kafka
 
 ```sh
-docker compose -f docker-compose.dev.yml up
+docker compose up
 ```
 
 ```sh
