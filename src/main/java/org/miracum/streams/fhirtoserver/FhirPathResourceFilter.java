@@ -4,14 +4,12 @@ import ca.uhn.fhir.fhirpath.IFhirPath;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.PrimitiveType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FhirPathResourceFilter {
   private final IFhirPath fhirPath;
 
-  @Autowired
   public FhirPathResourceFilter(IFhirPath fhirPath) {
     this.fhirPath = fhirPath;
   }

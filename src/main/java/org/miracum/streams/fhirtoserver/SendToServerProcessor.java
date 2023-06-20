@@ -11,7 +11,10 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.util.Strings;
 import org.hl7.fhir.r4.model.Bundle;
@@ -19,9 +22,9 @@ import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
+@Configuration
 @Service
 public class SendToServerProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(SendToServerProcessor.class);
@@ -49,11 +53,25 @@ public class SendToServerProcessor {
   private static final Counter messageNullCounter =
       Metrics.globalRegistry.counter(PROCESSING_ERRORS_COUNTER_NAME, "kind", "message-is-null");
 
+  private static final Counter messageEmptyCounter =
+      Metrics.globalRegistry.counter(
+          PROCESSING_ERRORS_COUNTER_NAME, "kind", "message-batch-is-empty");
+
   private static final Counter filterMatchedCounter =
       Metrics.globalRegistry.counter("fhirtoserver.fhir.filter.matches.total");
 
   private static final Timer filterDurationTimer =
       Metrics.globalRegistry.timer("fhirtoserver.fhir.filter.duration");
+
+  private static final Timer sendingDurationTimer =
+      Metrics.globalRegistry.timer("fhirtoserver.fhir.client.transaction.duration");
+
+  private static final Timer sendingDurationNormalizedTimer =
+      Metrics.globalRegistry.timer(
+          "fhirtoserver.fhir.client.transaction.duration.normalized.by.bundle.size");
+
+  private static final Timer bundleMergingDurationTimer =
+      Metrics.globalRegistry.timer("fhirtoserver.fhir.batch.bundle.merge.duration");
 
   private final IGenericClient client;
   private final RetryTemplate retryTemplate;
@@ -61,16 +79,29 @@ public class SendToServerProcessor {
   private final Bundle.BundleType overrideBundleType;
   private final FhirPathResourceFilter resourceFilter;
 
-  @Autowired
+  private final boolean isMergeMessageBatchesIntoSingleBundleEnabled;
+  private final String mergeBatchesBundleEntryUniquenessExpression;
+
+  private final FhirBundleMerger fhirBundleMerger;
+
   public SendToServerProcessor(
       IGenericClient fhirClient,
       @Value("${fhir.filter.expression}") String fhirPathFilterExpression,
       @Value("${fhir.override-bundle-type-with}") Bundle.BundleType overrideBundleType,
-      FhirPathResourceFilter resourceFilter) {
+      @Value("${fhir.merge-batches-into-single-bundle.enabled}")
+          boolean isMergeMessageBatchesIntoSingleBundleEnabled,
+      @Value("${fhir.merge-batches-into-single-bundle.entry-uniqueness-fhirpath-expression}")
+          String mergeBatchesBundleEntryUniquenessExpression,
+      FhirPathResourceFilter resourceFilter,
+      FhirBundleMerger fhirBundleMerger) {
     this.fhirPathFilterExpression = fhirPathFilterExpression;
     this.overrideBundleType = overrideBundleType;
+    this.isMergeMessageBatchesIntoSingleBundleEnabled =
+        isMergeMessageBatchesIntoSingleBundleEnabled;
+    this.mergeBatchesBundleEntryUniquenessExpression = mergeBatchesBundleEntryUniquenessExpression;
     this.resourceFilter = resourceFilter;
     client = fhirClient;
+    this.fhirBundleMerger = fhirBundleMerger;
 
     this.retryTemplate = new RetryTemplate();
 
@@ -116,58 +147,94 @@ public class SendToServerProcessor {
   }
 
   @Bean
-  public Consumer<Resource> sink() {
-    return resource -> {
-      if (resource == null) {
+  Consumer<List<Resource>> sink() {
+    return resourceBatch -> {
+      if (resourceBatch == null) {
         LOG.warn("resource is null. Ignoring.");
         messageNullCounter.increment();
         return;
       }
 
-      MDC.put("resourceId", resource.getIdElement().toUnqualifiedVersionless().toString());
-      MDC.put("resourceType", resource.getResourceType().name());
-
-      if (!(resource instanceof Bundle bundle)) {
-        LOG.warn("Can only process resources of type Bundle. Ignoring.");
-        unsupportedResourceTypeCounter.increment();
+      if (resourceBatch.isEmpty()) {
+        LOG.warn("received batch is empty. Ignoring.");
+        messageEmptyCounter.increment();
         return;
       }
 
-      var firstEntryResource = bundle.getEntryFirstRep().getResource();
-      if (firstEntryResource != null) {
-        MDC.put(
-            "bundleFirstEntryId",
-            firstEntryResource.getIdElement().toUnqualifiedVersionless().toString());
-        MDC.put("bundleFirstEntryType", firstEntryResource.getResourceType().name());
+      LOG.debug("Processing batch of {} resources", kv("batchSize", resourceBatch.size()));
+      var allBundlesInBatch = new ArrayList<Bundle>();
+      for (var resource : resourceBatch) {
+        if (!(resource instanceof Bundle bundle)) {
+          LOG.warn("Can only process resources of type Bundle. Ignoring.");
+          unsupportedResourceTypeCounter.increment();
+          continue;
+        }
+        allBundlesInBatch.add(bundle);
       }
 
-      if (overrideBundleType != null) {
-        bundle.setType(overrideBundleType);
-      }
+      if (isMergeMessageBatchesIntoSingleBundleEnabled) {
+        var mergedBundle =
+            bundleMergingDurationTimer.record(
+                () ->
+                    fhirBundleMerger.merge(
+                        allBundlesInBatch, mergeBatchesBundleEntryUniquenessExpression));
+        sendSingleBundle(mergedBundle);
+      } else {
+        LOG.debug("Sending all bundles in batch one by one");
+        for (var bundle : allBundlesInBatch) {
 
-      var shouldSend = true;
+          MDC.put("bundleSize", String.valueOf(bundle.getEntry().size()));
 
-      if (Strings.isNotBlank(fhirPathFilterExpression)) {
-        LOG.debug(
-            "Applying FHIR path filter {} to resource", kv("expression", fhirPathFilterExpression));
+          var firstEntryResource = bundle.getEntryFirstRep().getResource();
+          if (firstEntryResource != null) {
+            MDC.put(
+                "bundleFirstEntryId",
+                firstEntryResource.getIdElement().toUnqualifiedVersionless().toString());
+            MDC.put("bundleFirstEntryType", firstEntryResource.getResourceType().name());
+          }
 
-        shouldSend =
-            Boolean.TRUE.equals(
-                filterDurationTimer.record(
-                    () -> resourceFilter.matches(resource, fhirPathFilterExpression)));
-
-        if (shouldSend) {
-          LOG.debug("FHIR path filter matched");
-          filterMatchedCounter.increment();
-        } else {
-          LOG.debug("Filtered out resource via path expression");
+          sendSingleBundle(bundle);
         }
       }
+    };
+  }
+
+  void sendSingleBundle(Bundle bundle) {
+    if (overrideBundleType != null) {
+      bundle.setType(overrideBundleType);
+    }
+
+    var shouldSend = true;
+
+    if (Strings.isNotBlank(fhirPathFilterExpression)) {
+      LOG.debug(
+          "Applying FHIR path filter {} to bundle", kv("expression", fhirPathFilterExpression));
+
+      shouldSend =
+          filterDurationTimer.record(
+              () -> resourceFilter.matches(bundle, fhirPathFilterExpression));
 
       if (shouldSend) {
-        LOG.debug("Sending Bundle to server");
-        retryTemplate.execute(context -> client.transaction().withBundle(bundle).execute());
+        LOG.debug("FHIR path filter matched");
+        filterMatchedCounter.increment();
+      } else {
+        LOG.debug("Filtered out resource via path expression");
       }
-    };
+    }
+
+    if (shouldSend) {
+      var bundleSize = bundle.getEntry().size();
+      LOG.debug("Sending Bundle with {} resources to server", kv("bundleSize", bundleSize));
+
+      var sendStartTime = System.nanoTime();
+
+      sendingDurationTimer.record(
+          () ->
+              retryTemplate.execute(context -> client.transaction().withBundle(bundle).execute()));
+
+      var duration = System.nanoTime() - sendStartTime;
+      var timePerBundleEntry = duration / bundleSize;
+      sendingDurationNormalizedTimer.record(timePerBundleEntry, TimeUnit.NANOSECONDS);
+    }
   }
 }

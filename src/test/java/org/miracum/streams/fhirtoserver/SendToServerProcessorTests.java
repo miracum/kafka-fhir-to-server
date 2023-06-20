@@ -14,7 +14,8 @@ class SendToServerProcessorTests {
     var filter = new FhirPathResourceFilter(new FhirPathR4(fhirContext));
     var serverUrl = "http://localhost/fhir";
     sut =
-        new SendToServerProcessor(fhirContext.newRestfulGenericClient(serverUrl), "", null, filter);
+        new SendToServerProcessor(
+            fhirContext.newRestfulGenericClient(serverUrl), "", null, false, "", filter, null);
   }
 
   @Test
