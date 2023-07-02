@@ -23,7 +23,7 @@ manifests:
       - name: akhq
         remoteChart: akhq
         repo: https://akhq.io/
-        version: 0.3.1
+        version: 0.24.0
         skipBuildDependencies: true
         wait: true
         valuesFiles:

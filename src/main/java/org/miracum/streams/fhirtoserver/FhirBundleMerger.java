@@ -3,9 +3,9 @@ package org.miracum.streams.fhirtoserver;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import ca.uhn.fhir.fhirpath.IFhirPath;
+import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.StringType;
@@ -59,7 +59,7 @@ public class FhirBundleMerger {
     var resultBundle =
         new Bundle()
             .setType(bundles.get(0).getType())
-            .setEntry(setOfUniqueBundleEntries.entrySet().stream().map(Entry::getValue).toList());
+            .setEntry(setOfUniqueBundleEntries.values().stream().toList());
 
     LOG.debug(
         "{} input bundles merged to one bundle of {} entries",
@@ -67,5 +67,19 @@ public class FhirBundleMerger {
         kv("numMergedEntries", resultBundle.getEntry().size()));
 
     return resultBundle;
+  }
+
+  public List<Bundle> partitionBundle(final Bundle bundle, int maxPartitionSize) {
+    var partitions = Lists.partition(bundle.getEntry(), maxPartitionSize);
+
+    return partitions.stream()
+        .map(
+            partition -> {
+              var partitionBundle = new Bundle();
+              partitionBundle.setType(bundle.getType());
+              partitionBundle.setEntry(partition);
+              return partitionBundle;
+            })
+        .toList();
   }
 }

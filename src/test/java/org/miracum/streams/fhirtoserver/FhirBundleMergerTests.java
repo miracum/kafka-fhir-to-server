@@ -13,6 +13,8 @@ import org.hl7.fhir.r4.model.Bundle.HTTPVerb;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class FhirBundleMergerTests {
   private final FhirContext fhirContext = FhirContext.forR4();
@@ -78,5 +80,32 @@ public class FhirBundleMergerTests {
     assertThat(resultBundleEntry.getResource().fhirType()).isEqualTo("Patient");
     assertThat(resultBundleEntry.getRequest().getUrl()).isEqualTo("Patient/p");
     assertThat(resultBundleEntry.getRequest().getMethod()).isEqualTo(HTTPVerb.PUT);
+  }
+
+  @ParameterizedTest
+  @CsvSource({"10,5", "60,3", "100,10"})
+  void partitionBundle_withBundleExceedingSize_shouldBeSplitIntoMultipleBundles(
+      int inputBundleSize, int partitionSize) {
+
+    var inputBundle = new Bundle();
+    inputBundle.setType(BundleType.TRANSACTION);
+
+    for (int i = 0; i < inputBundleSize; i++) {
+      var patient = new Patient();
+      patient.setId("p-" + i);
+
+      inputBundle
+          .addEntry()
+          .setResource(patient)
+          .setFullUrl("Patient/p-" + i)
+          .getRequest()
+          .setMethod(HTTPVerb.PUT)
+          .setUrl("Patient/p-" + i);
+    }
+
+    var partitioned = sut.partitionBundle(inputBundle, partitionSize);
+
+    assertThat(partitioned)
+        .allSatisfy(bundle -> assertThat(bundle.getEntry()).hasSize(partitionSize));
   }
 }

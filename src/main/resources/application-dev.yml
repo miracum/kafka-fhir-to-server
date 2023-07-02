@@ -19,6 +19,7 @@ fhir:
   merge-batches-into-single-bundle:
     enabled: true
     entry-uniqueness-fhirpath-expression: "resource.id.toString()"
+    bundle-max-size: 25
 
 logging:
   level:

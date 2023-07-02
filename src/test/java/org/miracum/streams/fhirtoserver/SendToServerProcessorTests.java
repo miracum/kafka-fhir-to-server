@@ -3,6 +3,7 @@ package org.miracum.streams.fhirtoserver;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import ca.uhn.fhir.context.FhirContext;
+import java.util.Optional;
 import org.hl7.fhir.r4.hapi.fluentpath.FhirPathR4;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,12 @@ class SendToServerProcessorTests {
     var serverUrl = "http://localhost/fhir";
     sut =
         new SendToServerProcessor(
-            fhirContext.newRestfulGenericClient(serverUrl), "", null, false, "", filter, null);
+            fhirContext.newRestfulGenericClient(serverUrl),
+            "",
+            null,
+            new FhirBundleMergerConfig(false, null, Optional.empty()),
+            filter,
+            null);
   }
 
   @Test

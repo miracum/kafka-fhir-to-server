@@ -23,12 +23,16 @@ spring:
         max.request.size: ${MAX_REQUEST_SIZE:1048576}
         request.timeout.ms: ${REQUEST_TIMEOUT_MS:900000}
   cloud:
+    function:
+      definition: sink
     stream:
-      function.definition: sink
       bindings:
         sink-in-0:
           consumer:
             concurrency: ${CONSUMER_CONCURRENCY:1}
+            # this can't be set to `false` unless we change the signature of the
+            # `sink` method since it currently receives a List<> instead of a single
+            # record.
             batch-mode: true
             use-native-decoding: true
           destination: ${TOPIC:fhir-msg}
@@ -78,6 +82,7 @@ fhir:
   merge-batches-into-single-bundle:
     enabled: false
     entry-uniqueness-fhirpath-expression: "fullUrl.toString()"
+    bundle-max-size: null
 
 logging:
   pattern:

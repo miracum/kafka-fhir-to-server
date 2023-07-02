@@ -134,17 +134,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b # v2.8.1
+        uses: sigstore/cosign-installer@dd6b2e2b610a11fd73dd187a43d57cc1394e35f9 # v3.0.5
 
       - name: Sign image
         env:
           IMAGES: ${{ needs.build.outputs.image-tags }}
           DIGEST: ${{ needs.build.outputs.image-digest }}
-          COSIGN_EXPERIMENTAL: "true"
         run: |
           while read -r image; do
             echo "Signing '$image' using keyless approach"
-            cosign sign "$image@$DIGEST"
+            cosign sign --yes "$image@$DIGEST"
           done <<< "$IMAGES"
 
   container-provenance:

@@ -1,9 +1,6 @@
 configuration:
   akhq:
     server:
-      access-log:
-        enabled: false
-        name: org.akhq.log.access
     connections:
       my-cluster: # url friendly name for the cluster (letter, number, _, -, ... dot are not allowed here)
         properties: # standard kafka properties (optional)

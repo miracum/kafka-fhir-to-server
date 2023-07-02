@@ -9,6 +9,7 @@ import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 import java.util.ArrayList;
@@ -73,34 +74,30 @@ public class SendToServerProcessor {
   private static final Timer bundleMergingDurationTimer =
       Metrics.globalRegistry.timer("fhirtoserver.fhir.batch.bundle.merge.duration");
 
+  private static final DistributionSummary sendBundleSizeDistribution =
+      Metrics.globalRegistry.summary("fhirtoserver.fhir.batch.bundle.size");
+
   private final IGenericClient client;
   private final RetryTemplate retryTemplate;
   private final String fhirPathFilterExpression;
   private final Bundle.BundleType overrideBundleType;
   private final FhirPathResourceFilter resourceFilter;
-
-  private final boolean isMergeMessageBatchesIntoSingleBundleEnabled;
-  private final String mergeBatchesBundleEntryUniquenessExpression;
-
   private final FhirBundleMerger fhirBundleMerger;
+
+  private FhirBundleMergerConfig batchMergingConfig;
 
   public SendToServerProcessor(
       IGenericClient fhirClient,
       @Value("${fhir.filter.expression}") String fhirPathFilterExpression,
       @Value("${fhir.override-bundle-type-with}") Bundle.BundleType overrideBundleType,
-      @Value("${fhir.merge-batches-into-single-bundle.enabled}")
-          boolean isMergeMessageBatchesIntoSingleBundleEnabled,
-      @Value("${fhir.merge-batches-into-single-bundle.entry-uniqueness-fhirpath-expression}")
-          String mergeBatchesBundleEntryUniquenessExpression,
+      FhirBundleMergerConfig batchMergingConfig,
       FhirPathResourceFilter resourceFilter,
       FhirBundleMerger fhirBundleMerger) {
-    this.fhirPathFilterExpression = fhirPathFilterExpression;
     this.overrideBundleType = overrideBundleType;
-    this.isMergeMessageBatchesIntoSingleBundleEnabled =
-        isMergeMessageBatchesIntoSingleBundleEnabled;
-    this.mergeBatchesBundleEntryUniquenessExpression = mergeBatchesBundleEntryUniquenessExpression;
+    this.batchMergingConfig = batchMergingConfig;
+    this.fhirPathFilterExpression = fhirPathFilterExpression;
     this.resourceFilter = resourceFilter;
-    client = fhirClient;
+    this.client = fhirClient;
     this.fhirBundleMerger = fhirBundleMerger;
 
     this.retryTemplate = new RetryTemplate();
@@ -172,13 +169,28 @@ public class SendToServerProcessor {
         allBundlesInBatch.add(bundle);
       }
 
-      if (isMergeMessageBatchesIntoSingleBundleEnabled) {
+      if (batchMergingConfig.enabled()) {
         var mergedBundle =
             bundleMergingDurationTimer.record(
                 () ->
                     fhirBundleMerger.merge(
-                        allBundlesInBatch, mergeBatchesBundleEntryUniquenessExpression));
-        sendSingleBundle(mergedBundle);
+                        allBundlesInBatch, batchMergingConfig.entryUniquenessFhirpathExpression()));
+
+        if (batchMergingConfig.bundleMaxSize().isPresent()) {
+          LOG.debug(
+              "Partitioning bundles enabled. Splitting single bundle of size {} into {} ones.",
+              kv("bundleSize", mergedBundle.getEntry().size()),
+              kv("maxPartitionSize", batchMergingConfig.bundleMaxSize().get()));
+          var partitionedBundles =
+              fhirBundleMerger.partitionBundle(
+                  mergedBundle, batchMergingConfig.bundleMaxSize().get());
+          for (var bundle : partitionedBundles) {
+            sendSingleBundle(bundle);
+          }
+        } else {
+          sendSingleBundle(mergedBundle);
+        }
+
       } else {
         LOG.debug("Sending all bundles in batch one by one");
         for (var bundle : allBundlesInBatch) {
@@ -225,6 +237,8 @@ public class SendToServerProcessor {
     if (shouldSend) {
       var bundleSize = bundle.getEntry().size();
       LOG.debug("Sending Bundle with {} resources to server", kv("bundleSize", bundleSize));
+
+      sendBundleSizeDistribution.record(bundleSize);
 
       var sendStartTime = System.nanoTime();
 
