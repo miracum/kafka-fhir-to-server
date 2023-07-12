@@ -16,13 +16,11 @@ fhir:
       enabled: true
       username: "test"
       password: "test"
+  merge-batches-into-single-bundle:
+    enabled: true
+    entry-uniqueness-fhirpath-expression: "resource.id.toString()"
+    bundle-max-size: 25
 
 logging:
   level:
     org.miracum: debug
-
-opentracing:
-  jaeger:
-    log-spans: true
-    enabled: true
-    service-name: ${spring.application.name}

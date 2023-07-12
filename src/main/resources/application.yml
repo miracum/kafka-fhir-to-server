@@ -23,12 +23,18 @@ spring:
         max.request.size: ${MAX_REQUEST_SIZE:1048576}
         request.timeout.ms: ${REQUEST_TIMEOUT_MS:900000}
   cloud:
+    function:
+      definition: sink
     stream:
-      function.definition: sink
       bindings:
         sink-in-0:
           consumer:
             concurrency: ${CONSUMER_CONCURRENCY:1}
+            # this can't be set to `false` unless we change the signature of the
+            # `sink` method since it currently receives a List<> instead of a single
+            # record.
+            batch-mode: true
+            use-native-decoding: true
           destination: ${TOPIC:fhir-msg}
           group: ${GROUP_ID:fhir-to-server}
       kafka:
@@ -44,10 +50,6 @@ spring:
             consumer:
               configuration:
                 value.deserializer: org.miracum.kafka.serializers.KafkaFhirDeserializer
-          binder:
-            configuration:
-              max.poll.interval.ms: ${MAX_POLL_INTERVAL_MS:300000}
-              max.poll.records: ${MAX_POLL_RECORDS:500}
   main:
     banner-mode: off
 
@@ -76,12 +78,11 @@ fhir:
       enabled: false
       username: ""
       password: ""
-  httpTimeoutSeconds: ${HTTP_TIMEOUT_S:60}
-
-opentracing:
-  jaeger:
-    log-spans: false
+  http-timeout-seconds: 60
+  merge-batches-into-single-bundle:
     enabled: false
+    entry-uniqueness-fhirpath-expression: "fullUrl.toString()"
+    bundle-max-size: null
 
 logging:
   pattern:

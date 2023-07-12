@@ -48,7 +48,7 @@ services:
     restart: on-failure
     command:
       [
-        "while true; do kafkacat -b kafka:9092 -t fhir-msg -P -l /data/mock-data.ndjson; sleep 10; done",
+        "while true; do kafkacat -b kafka:9092 -t fhir-msg -P -l /data/mock-data.ndjson; sleep 5; done",
       ]
     volumes:
       - ${PWD}/hack/mock-data.ndjson:/data/mock-data.ndjson:ro
