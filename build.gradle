@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '3.1.1'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '3.1.3'
+    id 'io.spring.dependency-management' version '1.1.3'
     id 'java'
     id 'jacoco'
-    id 'com.diffplug.spotless' version '6.19.0'
+    id 'com.diffplug.spotless' version '6.21.0'
 }
 
 group = 'org.miracum.streams'
@@ -21,8 +21,8 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', '2022.0.3')
-    set('hapiVersion', '6.6.1')
+    set('springCloudVersion', '2022.0.4')
+    set('hapiVersion', '6.8.0')
 }
 
 dependencies {
@@ -35,8 +35,8 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.1'
-    implementation 'io.micrometer:micrometer-core:1.11.1'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.3'
+    implementation 'io.micrometer:micrometer-core:1.11.3'
 
     implementation 'org.miracum:kafka-fhir-serializer:1.0.4'
 
@@ -48,7 +48,7 @@ dependencies {
     implementation "ca.uhn.hapi.fhir:hapi-fhir-client-okhttp:${hapiVersion}"
     implementation "ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:${hapiVersion}"
 
-    implementation 'org.fhir:ucum:1.0.3'
+    implementation 'org.fhir:ucum:1.0.8'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
