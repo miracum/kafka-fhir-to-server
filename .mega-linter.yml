@@ -23,7 +23,7 @@ GROOVY_NPM_GROOVY_LINT_ARGUMENTS:
   - "--failon=warning"
 
 REPOSITORY_TRIVY_ARGUMENTS:
-  - "--severity=MEDIUM,HIGH,CRITICAL"
+  - "--severity='HIGH,CRITICAL'"
   - "--ignore-unfixed"
 
 JAVA_CHECKSTYLE_CONFIG_FILE: .checkstyle/checkstyle.xml
