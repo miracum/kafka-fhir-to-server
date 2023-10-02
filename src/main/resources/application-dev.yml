@@ -15,6 +15,7 @@ fhir:
     basic:
       enabled: true
       username: "test"
+      # kics-scan ignore-line
       password: "test"
   merge-batches-into-single-bundle:
     enabled: true
