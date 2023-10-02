@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM docker.io/library/gradle:8.3.0-jdk17@sha256:8a7f1dcf0d87d8245909f6f65ae34470e4721a4208c8f4f43877bc83c0622587 AS build
+FROM docker.io/library/gradle:8.3.0-jdk17@sha256:5f4ab273b15961c5f22969136ea884ca0343f1d8b2df5c4c6fe0ca8939b401b1 AS build
 WORKDIR /home/gradle/src
 ENV GRADLE_USER_HOME /gradle
 
@@ -15,7 +15,7 @@ awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", 
 java -Djarmode=layertools -jar build/libs/*.jar extract
 EOF
 
-FROM gcr.io/distroless/java17-debian11@sha256:4721a1387a0d01878ce6db784fef40ba682d5ed93b0a0546d364a83bf10b6fc3
+FROM gcr.io/distroless/java17-debian11@sha256:891d3c8081acb3b900eeaff045ed3c6fe3f4375a05b909710028ee0b7841e2e9
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/src/dependencies/ ./
 COPY --from=build /home/gradle/src/snapshot-dependencies/ ./
