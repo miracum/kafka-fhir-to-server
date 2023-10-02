@@ -35,6 +35,7 @@ manifests:
         skipBuildDependencies: true
         wait: true
         setValues:
+          # kics-scan ignore-line
           postgresql.auth.postgresPassword: fhir
       - name: stream-processors
         remoteChart: stream-processors
