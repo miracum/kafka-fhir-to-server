@@ -108,7 +108,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@dd6b2e2b610a11fd73dd187a43d57cc1394e35f9 # v3.0.5
+        uses: sigstore/cosign-installer@11086d25041f77fe8fe7b9ea4e48e3b9192b8f19 # v3.1.2
 
       - name: Sign image
         env:
@@ -128,7 +128,7 @@ jobs:
       actions: read # for detecting the Github Actions environment.
       id-token: write
       packages: write # for uploading attestations.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.7.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.9.0
     with:
       image: ${{ needs.build.outputs.image-name }}
       digest: ${{ needs.build.outputs.image-digest }}
