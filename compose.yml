@@ -1,6 +1,6 @@
 services:
   fhir:
-    image: docker.io/hapiproject/hapi:v6.8.3@sha256:6195f1116ebabfb0a608addde043b3e524c456c4d4f35b3d25025afd7dcd2e27
+    image: docker.io/hapiproject/hapi:v6.10.1@sha256:4eac1b3481180b028616d1fab7e657e368538063d75f7ed3be2032e34c657dd4
     environment:
       HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
@@ -11,7 +11,7 @@ services:
       - 8082:8080
 
   kafka:
-    image: docker.io/bitnami/kafka:3.6.0@sha256:2d065103d482dd0b985e15e39eaf17dc7627a755321952be807335d7ae67533c
+    image: docker.io/bitnami/kafka:3.6.1@sha256:86b67e37b3d2acf2b2b7fe6e0e73cc5ac560f20627d7e2e6b3ab5eb79c7f5c0b
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -49,7 +49,7 @@ services:
       - kafka
 
   mock-data-loader:
-    image: docker.io/confluentinc/cp-kafkacat:7.1.9@sha256:97584651f761151dde33a90321ee09ca0a1f2e5be2075ddf88379bad78b60148
+    image: docker.io/confluentinc/cp-kafkacat:7.1.11@sha256:b32a0fc2e8dd0ab25201cc62f856d41a7133e3def9e622471d15383af30b5111
     entrypoint: ["/bin/bash", "-c"]
     restart: on-failure
     command:
