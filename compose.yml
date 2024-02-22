@@ -8,7 +8,7 @@ services:
       HAPI_FHIR_CORS_ALLOWCREDENTIALS: "false"
       HAPI_FHIR_CORS_ALLOWED_ORIGIN: "*"
     ports:
-      - 8082:8080
+      - 127.0.0.1:8082:8080
 
   kafka:
     image: docker.io/bitnami/kafka:3.6.1@sha256:86b67e37b3d2acf2b2b7fe6e0e73cc5ac560f20627d7e2e6b3ab5eb79c7f5c0b
@@ -32,7 +32,7 @@ services:
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
     ports:
-      - 9094:9094
+      - 127.0.0.1:9094:9094
 
   akhq:
     image: docker.io/tchiotludo/akhq:0.24.0@sha256:6ccf8323ae6e93a893107f857cd9f7210add3569743b2c8528c6567967cc636f
@@ -44,7 +44,7 @@ services:
               properties:
                 bootstrap.servers: "kafka:9092"
     ports:
-      - 9000:8080
+      - 127.0.0.1:8084:8080
     depends_on:
       - kafka
 
@@ -63,11 +63,11 @@ services:
 
   minio:
     image: docker.io/bitnami/minio:2024.2.17-debian-12-r2@sha256:4d04a41f9d385d51ecd9be8dafca13fe9d56be2cc1c5ea8f98e6cfb235d87ae5
-    profiles:
-      - minio
     environment:
       MINIO_ROOT_USER: "admin"
-      MINIO_ROOT_PASSWORD: "miniopass"
+      # kics-scan ignore-line
+      MINIO_ROOT_PASSWORD: "miniopass" # gitleaks:allow
+      MINIO_DEFAULT_BUCKETS: "fhir"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"

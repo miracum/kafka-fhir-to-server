@@ -6,7 +6,7 @@ ENV GRADLE_USER_HOME /gradle
 COPY build.gradle settings.gradle gradle.properties ./
 RUN gradle --no-daemon build || true
 
-COPY --chown=gradle:gradle . .
+COPY . .
 
 RUN <<EOF
 gradle --no-daemon build  --info
@@ -18,13 +18,11 @@ EOF
 FROM gcr.io/distroless/java17-debian12:nonroot@sha256:dacfdfe30039c48c0fe77d251bdb1d15437a2795130dec67f701f5344d5cc3df
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/src/dependencies/ ./
-COPY --from=build /home/gradle/src/snapshot-dependencies/ ./
 COPY --from=build /home/gradle/src/spring-boot-loader/ ./
-COPY --from=build /home/gradle/src/application/ .
+COPY --from=build /home/gradle/src/snapshot-dependencies/ ./
+COPY --from=build /home/gradle/src/application/ ./
 
 USER 65532:65532
 EXPOSE 8080/tcp
-ARG VERSION=0.0.0
-ENV APP_VERSION=${VERSION} \
-    SPRING_PROFILES_ACTIVE=prod
+ENV SPRING_PROFILES_ACTIVE=prod
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

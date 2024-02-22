@@ -5,10 +5,15 @@ import ca.uhn.fhir.fhirpath.IFhirPath;
 import ca.uhn.fhir.okhttp.client.OkHttpRestfulClientFactory;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
+import io.minio.MinioClient;
+import io.minio.credentials.AwsEnvironmentProvider;
+import io.minio.credentials.Provider;
+import io.minio.credentials.StaticProvider;
 import java.time.Duration;
 import okhttp3.OkHttpClient;
 import org.hl7.fhir.r4.hapi.fluentpath.FhirPathR4;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -55,5 +60,23 @@ public class Config {
   @Bean
   IFhirPath fhirPath(FhirContext ctx) {
     return new FhirPathR4(ctx);
+  }
+
+  @Bean
+  @ConditionalOnProperty(prefix = "s3", name = "enabled", havingValue = "true")
+  MinioClient minioClient(S3Config config) {
+    Provider credentialsProvider;
+
+    if (config.accessKey().isPresent() && config.secretKey().isPresent()) {
+      credentialsProvider =
+          new StaticProvider(config.accessKey().get(), config.secretKey().get(), null);
+    } else {
+      credentialsProvider = new AwsEnvironmentProvider();
+    }
+
+    return MinioClient.builder()
+        .credentialsProvider(credentialsProvider)
+        .endpoint(config.endpointUrl())
+        .build();
   }
 }

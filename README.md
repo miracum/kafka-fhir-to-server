@@ -28,6 +28,17 @@ Published as `ghcr.io/miracum/kafka-fhir-to-server`.
 
 See [application.yml](src/main/resources/application.yml) for more options.
 
+### Sending resources to S3-compatible object storage (Experimental)
+
+| Environment variable    | Description                                                                                                                                                                                      | Default  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| `S3_ENABLED`            | Set to `true` to persist resources as ndjson in object storage instead of sending them to a FHIR server.                                                                                         | `false`  |
+| `S3_ENDPOINT_URL`       | Object storage endpoint url                                                                                                                                                                      | `""`     |
+| `S3_ACCESS_KEY`         | The access key. Can also be left empty to use the `AWS_ACCESS_KEY_ID` environment variable instead.                                                                                              | `""`     |
+| `S3_SECRET_KEY`         | The secret key. Can also be left empty to use the `AWS_SECRET_ACCESS_KEY` environment variable instead.                                                                                          | `""`     |
+| `S3_BUCKET_NAME`        | The name of the bucket to store the resources. The actual resources are grouped by their type and stored using the current epoch timestamp, e.g. `<S3_BUCKET_NAME>/Patient/bundle-123456.ndjson` | `"fhir"` |
+| `S3_OBJECT_NAME_PREFIX` | An optional prefix to prepend to the object name: `<S3_BUCKET_NAME><S3_OBJECT_NAME_PREFIX>Patient/bundle-123456.ndjson`                                                                          | `""`     |
+
 ## Observability
 
 The application publishes useful Prometheus metrics at `/actuator/prometheus`.

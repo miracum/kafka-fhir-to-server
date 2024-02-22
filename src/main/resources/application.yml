@@ -1,3 +1,6 @@
+app:
+  version: 2.0.6
+
 spring:
   application:
     name: fhir-to-server
@@ -68,6 +71,7 @@ management:
       enabled: true
     readinessstate:
       enabled: true
+
 fhir:
   filter:
     expression: ""
@@ -83,6 +87,14 @@ fhir:
     enabled: false
     entry-uniqueness-fhirpath-expression: "fullUrl.toString()"
     bundle-max-size: null
+
+s3:
+  enabled: false
+  endpoint-url: ""
+  access-key: ""
+  secret-key: ""
+  bucket-name: "fhir"
+  object-name-prefix: ""
 
 logging:
   pattern:

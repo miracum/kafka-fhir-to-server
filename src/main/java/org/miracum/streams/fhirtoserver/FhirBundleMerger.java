@@ -70,6 +70,7 @@ public class FhirBundleMerger {
   }
 
   public List<Bundle> partitionBundle(final Bundle bundle, int maxPartitionSize) {
+    @SuppressWarnings("null")
     var partitions = Lists.partition(bundle.getEntry(), maxPartitionSize);
 
     return partitions.stream()

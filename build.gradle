@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.miracum.streams'
-version = '0.0.1-SNAPSHOT'
+version = '2.0.6'
 sourceCompatibility = '17'
 
 configurations {

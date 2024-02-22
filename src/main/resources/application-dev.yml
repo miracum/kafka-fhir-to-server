@@ -22,6 +22,13 @@ fhir:
     entry-uniqueness-fhirpath-expression: "resource.id.toString()"
     bundle-max-size: 25
 
+s3:
+  enabled: false
+  endpoint-url: "http://localhost:9000"
+  access-key: "admin"
+  secret-key: "miniopass"
+  object-name-prefix: "dev/test/prefix/"
+
 logging:
   level:
     org.miracum: debug

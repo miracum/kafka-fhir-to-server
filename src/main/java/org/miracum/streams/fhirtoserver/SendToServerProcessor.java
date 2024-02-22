@@ -2,6 +2,7 @@ package org.miracum.streams.fhirtoserver;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
@@ -12,6 +13,12 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
+import io.minio.errors.ErrorResponseException;
+import io.minio.errors.InternalException;
+import io.minio.errors.ServerException;
+import io.minio.errors.XmlParserException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +33,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
@@ -84,7 +92,10 @@ public class SendToServerProcessor {
   private final FhirPathResourceFilter resourceFilter;
   private final FhirBundleMerger fhirBundleMerger;
 
-  private FhirBundleMergerConfig batchMergingConfig;
+  private final FhirBundleMergerConfig batchMergingConfig;
+
+  private final S3Config s3Config;
+  private S3BundleStore s3Store;
 
   public SendToServerProcessor(
       IGenericClient fhirClient,
@@ -92,13 +103,17 @@ public class SendToServerProcessor {
       @Value("${fhir.override-bundle-type-with}") Bundle.BundleType overrideBundleType,
       FhirBundleMergerConfig batchMergingConfig,
       FhirPathResourceFilter resourceFilter,
-      FhirBundleMerger fhirBundleMerger) {
+      FhirBundleMerger fhirBundleMerger,
+      S3Config s3Config,
+      @Nullable S3BundleStore s3Store) {
     this.overrideBundleType = overrideBundleType;
     this.batchMergingConfig = batchMergingConfig;
     this.fhirPathFilterExpression = fhirPathFilterExpression;
     this.resourceFilter = resourceFilter;
     this.client = fhirClient;
     this.fhirBundleMerger = fhirBundleMerger;
+    this.s3Config = s3Config;
+    this.s3Store = s3Store;
 
     this.retryTemplate = new RetryTemplate();
 
@@ -115,6 +130,13 @@ public class SendToServerProcessor {
     retryableExceptions.put(InternalErrorException.class, true);
     retryableExceptions.put(ResourceNotFoundException.class, false);
     retryableExceptions.put(ResourceVersionConflictException.class, false);
+    retryableExceptions.put(XmlParserException.class, false);
+    retryableExceptions.put(ServerException.class, false);
+    retryableExceptions.put(NoSuchAlgorithmException.class, false);
+    retryableExceptions.put(InternalException.class, true);
+    retryableExceptions.put(ErrorResponseException.class, true);
+    retryableExceptions.put(DataFormatException.class, false);
+    retryableExceptions.put(InvalidKeyException.class, false);
 
     retryTemplate.setRetryPolicy(new SimpleRetryPolicy(Integer.MAX_VALUE, retryableExceptions));
 
@@ -124,7 +146,7 @@ public class SendToServerProcessor {
           public <T, E extends Throwable> void onError(
               RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
             LOG.warn(
-                "Trying to sent resource to FHIR server caused error. {} attempt.",
+                "Trying to send resource to FHIR server caused error. Attempt: {}.",
                 context.getRetryCount(),
                 throwable);
             sendingFailedCounter.increment();
@@ -169,7 +191,15 @@ public class SendToServerProcessor {
         allBundlesInBatch.add(bundle);
       }
 
-      if (batchMergingConfig.enabled()) {
+      if (s3Config.enabled()) {
+        LOG.debug("Sending all bundles to object storage as merged bundles");
+        try {
+          retryTemplate.execute(context -> s3Store.storeBatch(allBundlesInBatch));
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      } else if (batchMergingConfig.enabled()) {
+        LOG.debug("Sending bundles as merged batches");
         var mergedBundle =
             bundleMergingDurationTimer.record(
                 () ->
@@ -190,7 +220,6 @@ public class SendToServerProcessor {
         } else {
           sendSingleBundle(mergedBundle);
         }
-
       } else {
         LOG.debug("Sending all bundles in batch one by one");
         for (var bundle : allBundlesInBatch) {
