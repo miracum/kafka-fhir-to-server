@@ -21,6 +21,8 @@ class SendToServerProcessorTests {
             null,
             new FhirBundleMergerConfig(false, null, Optional.empty()),
             filter,
+            null,
+            null,
             null);
   }
 

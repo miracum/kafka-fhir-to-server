@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.miracum.streams'
-version = '0.0.1-SNAPSHOT'
+version = '2.0.6'
 sourceCompatibility = '17'
 
 configurations {
@@ -22,7 +22,7 @@ repositories {
 
 ext {
     set('springCloudVersion', '2023.0.0')
-    set('hapiVersion', '6.10.4')
+    set('hapiVersion', '7.0.0')
 }
 
 dependencies {
@@ -49,6 +49,8 @@ dependencies {
     implementation "ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:${hapiVersion}"
 
     implementation 'org.fhir:ucum:1.0.8'
+
+    implementation 'io.minio:minio:8.5.8'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
