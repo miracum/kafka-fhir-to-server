@@ -60,3 +60,14 @@ services:
       - ${PWD}/hack/mock-data.ndjson:/data/mock-data.ndjson:ro
     depends_on:
       - kafka
+
+  minio:
+    image: docker.io/bitnami/minio:2024.2.17-debian-12-r2@sha256:4d04a41f9d385d51ecd9be8dafca13fe9d56be2cc1c5ea8f98e6cfb235d87ae5
+    profiles:
+      - minio
+    environment:
+      MINIO_ROOT_USER: "admin"
+      MINIO_ROOT_PASSWORD: "miniopass"
+    ports:
+      - "9000:9000"
+      - "9001:9001"

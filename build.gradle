@@ -50,6 +50,8 @@ dependencies {
 
     implementation 'org.fhir:ucum:1.0.8'
 
+    implementation 'io.minio:minio:8.5.8'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
