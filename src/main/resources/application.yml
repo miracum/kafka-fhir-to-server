@@ -85,7 +85,7 @@ fhir:
   http-timeout-seconds: 60
   merge-batches-into-single-bundle:
     enabled: false
-    entry-uniqueness-fhirpath-expression: "fullUrl.toString()"
+    entry-uniqueness-fhirpath-expression: "resource.id.toString()"
     bundle-max-size: null
 
 s3:
