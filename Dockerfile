@@ -15,7 +15,7 @@ awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", 
 java -Djarmode=layertools -jar build/libs/*.jar extract
 EOF
 
-FROM gcr.io/distroless/java17-debian12:nonroot@sha256:dacfdfe30039c48c0fe77d251bdb1d15437a2795130dec67f701f5344d5cc3df
+FROM gcr.io/distroless/java17-debian12:nonroot@sha256:1083557050d06156736184777ebafbe403bea3e511356f3662d8351550b57c11
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/src/dependencies/ ./
 COPY --from=build /home/gradle/src/spring-boot-loader/ ./
