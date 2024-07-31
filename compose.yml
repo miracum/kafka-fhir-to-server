@@ -1,6 +1,6 @@
 services:
   fhir:
-    image: docker.io/hapiproject/hapi:v7.0.3@sha256:73ff82fec42e5cbb7e66338d47af09ba91c140e98beeaee41a5459572d5ae1ce
+    image: docker.io/hapiproject/hapi:v7.2.0@sha256:9bcafa8342b572eee248cb7c48c496863d352bbd0347e1d98ea238d09620e89b
     environment:
       HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
@@ -11,7 +11,7 @@ services:
       - 127.0.0.1:8082:8080
 
   kafka:
-    image: docker.io/bitnami/kafka:3.7.0@sha256:c1e54c8bc46edfc23c25d53f6de1b1433e2e919870c679fa7a846a8af0b03427
+    image: docker.io/bitnami/kafka:3.7.1@sha256:dfa51517c4823ad8ce97cd5b5ed06798067c40634c06144384ee91097ceeabb2
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -35,7 +35,7 @@ services:
       - 127.0.0.1:9094:9094
 
   akhq:
-    image: docker.io/tchiotludo/akhq:0.24.0@sha256:6ccf8323ae6e93a893107f857cd9f7210add3569743b2c8528c6567967cc636f
+    image: docker.io/tchiotludo/akhq:0.25.1@sha256:cfaef8f419c4e4b78c583597d6428b63166e90eeb194af890264d68051a22180
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -49,7 +49,7 @@ services:
       - kafka
 
   mock-data-loader:
-    image: docker.io/confluentinc/cp-kafkacat:7.1.11@sha256:b32a0fc2e8dd0ab25201cc62f856d41a7133e3def9e622471d15383af30b5111
+    image: docker.io/confluentinc/cp-kafkacat:7.1.13@sha256:db089d066fe5d96001e5a4771df9fd6432fcaa496ff40ff7c87e704e904beb98
     entrypoint: ["/bin/bash", "-c"]
     restart: on-failure
     command:
@@ -62,7 +62,7 @@ services:
       - kafka
 
   minio:
-    image: docker.io/bitnami/minio:2024.2.17-debian-12-r2@sha256:4d04a41f9d385d51ecd9be8dafca13fe9d56be2cc1c5ea8f98e6cfb235d87ae5
+    image: docker.io/bitnami/minio:2024.7.31-debian-12-r0@sha256:cb0e2e7c8e89353fde00bc44d1de9dabd6491ba45ce166aea1ac7dbb9effc739
     environment:
       MINIO_ROOT_USER: "admin"
       # kics-scan ignore-line
