@@ -19,11 +19,10 @@ fhir:
       password: "test"
   merge-batches-into-single-bundle:
     enabled: true
-    entry-uniqueness-fhirpath-expression: "resource.id.toString()"
     bundle-max-size: 25
 
 s3:
-  enabled: false
+  enabled: true
   endpoint-url: "http://localhost:9000"
   access-key: "admin"
   secret-key: "miniopass"

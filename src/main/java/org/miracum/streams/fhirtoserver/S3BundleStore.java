@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -50,7 +51,7 @@ public class S3BundleStore {
     this.mergerConfig = mergerConfig;
   }
 
-  public Bundle storeBatch(List<Bundle> bundles)
+  public Void storeBatch(List<Bundle> bundles)
       throws DataFormatException,
           IOException,
           InvalidKeyException,
@@ -61,12 +62,13 @@ public class S3BundleStore {
           NoSuchAlgorithmException,
           ServerException,
           XmlParserException {
-    // start by merging all those bundles in a batch into a single Bundle containing distinct
-    // resources
-    var mergedBundle = merger.merge(bundles, mergerConfig.entryUniquenessFhirpathExpression());
+    // start by merging all those bundles
+    var mergedBundle =
+        merger.mergeSeperateDeleteBundles(
+            bundles, mergerConfig.entryUniquenessFhirpathExpression());
 
-    // extract all resources of type
-    var resources = BundleUtil.toListOfResources(fhirContext, mergedBundle);
+    // extract all POST/PUT bundle entries
+    var resources = BundleUtil.toListOfResources(fhirContext, mergedBundle.bundle());
 
     var grouped = resources.stream().collect(Collectors.groupingBy(IBaseResource::fhirType));
 
@@ -102,6 +104,44 @@ public class S3BundleStore {
         minioClient.putObject(putArgs);
       }
     }
-    return mergedBundle;
+
+    // extract the bundles grouped by the resource type of the DELETE request
+    var groupedDeletes =
+        mergedBundle.deletBundle().getEntry().stream()
+            .collect(Collectors.groupingBy(e -> e.getRequest().getUrl().split("/")[0]));
+
+    for (var entry : groupedDeletes.entrySet()) {
+      var deleteBundle = new Bundle();
+      deleteBundle.setType(BundleType.BATCH);
+
+      // turns all entries off the merged bundles into a single one
+      // per resource type
+      for (var bundleEntry : entry.getValue()) {
+        deleteBundle.addEntry().setRequest(bundleEntry.getRequest());
+      }
+
+      try (var stringWriter = new StringBuilderWriter()) {
+        var resourceType = entry.getKey();
+
+        parser.encodeResourceToWriter(deleteBundle, stringWriter);
+
+        var bais =
+            new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
+        var prefix = config.objectNamePrefix().orElse("");
+        var putArgs =
+            PutObjectArgs.builder()
+                .bucket(config.bucketName())
+                .object(
+                    String.format(
+                        "%s%s/_delete/bundle-%s.json",
+                        prefix, resourceType, Instant.now().toEpochMilli()))
+                .stream(bais, bais.available(), 0)
+                .contentType(Constants.CT_FHIR_NDJSON)
+                .build();
+
+        minioClient.putObject(putArgs);
+      }
+    }
+    return null;
   }
 }
