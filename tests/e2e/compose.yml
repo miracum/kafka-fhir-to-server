@@ -5,17 +5,37 @@ services:
       FHIR_URL: http://fhir:8080/fhir
       BOOTSTRAP_SERVERS: "kafka:9092"
     depends_on:
-      - fhir
-      - kafka
+      wait-for-fhir-server:
+        condition: service_completed_successfully
+      mock-data-loader:
+        condition: service_started
+
+  wait-for-fhir-server:
+    image: docker.io/curlimages/curl:8.8.0@sha256:73e4d532ea62d7505c5865b517d3704966ffe916609bedc22af6833dc9969bcd
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop:
+      - ALL
+    privileged: false
+    restart: "no"
+    environment:
+      FHIR_SERVER_URL: http://fhir:8080
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until [ "$(curl -s -o /dev/null -L -w "%{http_code}" "$$FHIR_SERVER_URL/fhir/metadata")" == "200" ]; do
+            echo "$(date): Waiting for fhir server @ $$FHIR_SERVER_URL to be up";
+            sleep 5;
+        done;
+    depends_on:
+      fhir:
+        condition: service_started
 
   test:
     build: .
     environment:
       FHIR_SERVER_URL: "http://fhir:8080/fhir"
     depends_on:
-      fhir:
-        condition: service_started
       kafka-fhir-to-server:
-        condition: service_started
-      mock-data-loader:
         condition: service_started
