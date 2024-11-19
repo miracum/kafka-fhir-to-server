@@ -35,8 +35,8 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.13.6'
-    implementation 'io.micrometer:micrometer-core:1.13.6'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.1'
+    implementation 'io.micrometer:micrometer-core:1.14.1'
 
     implementation 'org.miracum:kafka-fhir-serializer:1.0.8'
 

@@ -11,7 +11,7 @@ services:
       - 127.0.0.1:8082:8080
 
   kafka:
-    image: docker.io/bitnami/kafka:3.8.1@sha256:ba8ad20df40525eddcba79cb6c5edc00a283be2f5757b1e0747de2987073a063
+    image: docker.io/bitnami/kafka:3.9.0@sha256:978583d0859444d3bc6b6592b38b5af5a834d473db51441071a20e67e0afb945
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -62,7 +62,7 @@ services:
       - kafka
 
   minio:
-    image: docker.io/bitnami/minio:2024.10.29-debian-12-r1@sha256:d07cf144fe42fd6d49bc4757e5562baa92407157626e4ffebbeb02e03c716268
+    image: docker.io/bitnami/minio:2024.11.7-debian-12-r1@sha256:9f2d9c45006a2ada1bc485e1393291ce7d54ae1a46260dd491381a4eb8b2fd47
     environment:
       MINIO_ROOT_USER: "admin"
       # kics-scan ignore-line
