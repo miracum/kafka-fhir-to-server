@@ -2,7 +2,7 @@ services:
   fhir:
     image: docker.io/hapiproject/hapi:v7.4.0@sha256:f34b41f5002665f384cf344da2d8e653025bd095aa37aa6f5a9d6dc0dac75684
     environment:
-      HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "true"
+      HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "false"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "false"
       HAPI_FHIR_FHIR_VERSION: "R4"
       HAPI_FHIR_CORS_ALLOWCREDENTIALS: "false"
