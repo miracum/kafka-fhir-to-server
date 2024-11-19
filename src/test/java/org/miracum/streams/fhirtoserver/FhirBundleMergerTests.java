@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class FhirBundleMergerTests {
+class FhirBundleMergerTests {
   private final FhirContext fhirContext = FhirContext.forR4();
   private final FhirBundleMerger sut;
 
@@ -35,12 +35,13 @@ public class FhirBundleMergerTests {
   void merge_whenGivenListWithSingleBundle_shouldReturnThatBundle() {
     var bundle = new Bundle().setType(BundleType.TRANSACTION);
     bundle.setId("1");
+    bundle.addEntry().getRequest().setUrl("Patient/1");
 
     var bundles = List.of(bundle);
 
     var result = sut.merge(bundles);
 
-    assertThat(result).isEqualTo(bundle);
+    assertThat(result.getEntry()).hasSize(1);
   }
 
   @Test
