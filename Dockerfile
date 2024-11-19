@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1.11@sha256:1f2be5a2aa052cbd9aedf893d17c63277c3d1c51b3fb0f3b029c6b34f658d057
 FROM docker.io/library/gradle:8.11.0-jdk17@sha256:2903c3e041b429cbaeabcf39f00b763acd7f5bf15fb0e5f60055fc8f50a90c7f AS build
 WORKDIR /home/gradle/src
 ENV GRADLE_USER_HOME /gradle
