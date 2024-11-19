@@ -8,7 +8,12 @@ plugins {
 
 group = 'org.miracum.streams'
 version = '2.1.5'
-sourceCompatibility = '17'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
 
 configurations {
   compileOnly {
@@ -35,12 +40,12 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.13.6'
-    implementation 'io.micrometer:micrometer-core:1.13.6'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.1'
+    implementation 'io.micrometer:micrometer-core:1.14.1'
 
     implementation 'org.miracum:kafka-fhir-serializer:1.0.8'
 
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     implementation "ca.uhn.hapi.fhir:hapi-fhir-base:${hapiVersion}"
     implementation "ca.uhn.hapi.fhir:hapi-fhir-client:${hapiVersion}"

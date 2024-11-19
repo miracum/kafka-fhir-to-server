@@ -1,26 +1,26 @@
-# syntax=docker/dockerfile:1.11@sha256:1f2be5a2aa052cbd9aedf893d17c63277c3d1c51b3fb0f3b029c6b34f658d057
-FROM docker.io/library/gradle:8.10.2-jdk17@sha256:c2900027f3f0681c2cbfb09d527813851ad67aeafbb409997297efa2df20e748 AS build
-WORKDIR /home/gradle/src
-ENV GRADLE_USER_HOME /gradle
+FROM docker.io/library/gradle:8.11.0-jdk21@sha256:09f2f9448e8d490fc7d8f041cf03502c9749ec72aef6307a0042e5d03494b044 AS build
+WORKDIR /home/gradle/project
 
-COPY build.gradle settings.gradle gradle.properties ./
-RUN gradle --no-daemon build || true
+COPY --chown=gradle:gradle . .
 
-COPY . .
-
-RUN <<EOF
-gradle --no-daemon build  --info
-gradle --no-daemon jacocoTestReport
-awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' build/reports/jacoco/test/jacocoTestReport.csv
+RUN --mount=type=cache,target=/home/gradle/.gradle/caches <<EOF
+set -e
+gradle clean build --info
+gradle jacocoTestReport
 java -Djarmode=layertools -jar build/libs/*.jar extract
 EOF
 
-FROM gcr.io/distroless/java17-debian12:nonroot@sha256:193a2b8229bd624183e9397cbde81e3ef3985f1117e167bcb46b138a852f3f4d
+FROM scratch AS test
+WORKDIR /test
+COPY --from=build /home/gradle/project/build/reports/ .
+ENTRYPOINT [ "true" ]
+
+FROM gcr.io/distroless/java21-debian12:nonroot@sha256:eecb8ed3f30dab0e7a7077bf8ee535bf0e51ecfde963d05ac3d66c8754578c91
 WORKDIR /opt/kafka-fhir-to-server
-COPY --from=build /home/gradle/src/dependencies/ ./
-COPY --from=build /home/gradle/src/spring-boot-loader/ ./
-COPY --from=build /home/gradle/src/snapshot-dependencies/ ./
-COPY --from=build /home/gradle/src/application/ ./
+COPY --from=build /home/gradle/project/dependencies/ ./
+COPY --from=build /home/gradle/project/spring-boot-loader/ ./
+COPY --from=build /home/gradle/project/snapshot-dependencies/ ./
+COPY --from=build /home/gradle/project/application/ ./
 
 USER 65532:65532
 EXPOSE 8080/tcp
