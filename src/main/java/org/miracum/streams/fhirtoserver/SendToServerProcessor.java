@@ -17,6 +17,7 @@ import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InternalException;
 import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -137,6 +138,7 @@ public class SendToServerProcessor {
     retryableExceptions.put(ErrorResponseException.class, true);
     retryableExceptions.put(DataFormatException.class, false);
     retryableExceptions.put(InvalidKeyException.class, false);
+    retryableExceptions.put(IOException.class, true);
 
     retryTemplate.setRetryPolicy(new SimpleRetryPolicy(Integer.MAX_VALUE, retryableExceptions));
 
