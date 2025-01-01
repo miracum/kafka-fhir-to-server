@@ -1,6 +1,6 @@
 services:
   kafka-fhir-to-server:
-    image: ${KAFKA_FHIR_TO_SERVER_IMAGE:-ghcr.io/miracum/kafka-fhir-to-server:latest}
+    image: ${KAFKA_FHIR_TO_SERVER_IMAGE:-ghcr.io/miracum/kafka-fhir-to-server:latest@sha256:769a3b5a35e884bfd11789bb2a3629f537e0fb51cd73a6cf0e4d237ab43a3014}
     environment:
       FHIR_URL: http://fhir:8080/fhir
       BOOTSTRAP_SERVERS: "kafka:9092"
