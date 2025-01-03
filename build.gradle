@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '3.3.5'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'jacoco'
     id 'com.diffplug.spotless' version '6.25.0'
@@ -26,8 +26,8 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', '2023.0.3')
-    set('hapiVersion', '7.4.5')
+    set('springCloudVersion', '2024.0.0')
+    set('hapiVersion', '7.6.1')
 }
 
 dependencies {
@@ -40,8 +40,8 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.1'
-    implementation 'io.micrometer:micrometer-core:1.14.1'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.2'
+    implementation 'io.micrometer:micrometer-core:1.14.2'
 
     implementation 'org.miracum:kafka-fhir-serializer:1.0.8'
 
@@ -54,11 +54,11 @@ dependencies {
     implementation "ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:${hapiVersion}"
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
 
-    implementation 'org.fhir:ucum:1.0.8'
+    implementation 'org.fhir:ucum:1.0.9'
 
-    implementation platform("software.amazon.awssdk:bom:2.29.43")
+    implementation platform("software.amazon.awssdk:bom:2.29.45")
     implementation "software.amazon.awssdk:s3"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
