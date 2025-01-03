@@ -40,6 +40,8 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.RetryableException;
 
 @Configuration
 @Service
@@ -131,6 +133,8 @@ public class SendToServerProcessor {
     retryableExceptions.put(DataFormatException.class, false);
     retryableExceptions.put(InvalidKeyException.class, false);
     retryableExceptions.put(IOException.class, true);
+    retryableExceptions.put(AwsServiceException.class, true);
+    retryableExceptions.put(RetryableException.class, true);
 
     retryTemplate.setRetryPolicy(new SimpleRetryPolicy(Integer.MAX_VALUE, retryableExceptions));
 
