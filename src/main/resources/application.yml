@@ -95,6 +95,9 @@ s3:
   secret-key: ""
   bucket-name: "fhir"
   object-name-prefix: ""
+  region: "eu-central-1"
+  force-path-style: true
+  timeout-seconds: 120
 
 logging:
   pattern:

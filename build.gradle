@@ -58,7 +58,8 @@ dependencies {
 
     implementation 'org.fhir:ucum:1.0.8'
 
-    implementation 'io.minio:minio:8.5.13'
+    implementation platform("software.amazon.awssdk:bom:2.29.43")
+    implementation "software.amazon.awssdk:s3"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

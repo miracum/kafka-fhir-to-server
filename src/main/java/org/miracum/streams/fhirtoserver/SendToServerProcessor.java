@@ -13,10 +13,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InternalException;
-import io.minio.errors.ServerException;
-import io.minio.errors.XmlParserException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -44,6 +40,8 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.RetryableException;
 
 @Configuration
 @Service
@@ -131,14 +129,12 @@ public class SendToServerProcessor {
     retryableExceptions.put(InternalErrorException.class, true);
     retryableExceptions.put(ResourceNotFoundException.class, false);
     retryableExceptions.put(ResourceVersionConflictException.class, false);
-    retryableExceptions.put(XmlParserException.class, false);
-    retryableExceptions.put(ServerException.class, false);
     retryableExceptions.put(NoSuchAlgorithmException.class, false);
-    retryableExceptions.put(InternalException.class, true);
-    retryableExceptions.put(ErrorResponseException.class, true);
     retryableExceptions.put(DataFormatException.class, false);
     retryableExceptions.put(InvalidKeyException.class, false);
     retryableExceptions.put(IOException.class, true);
+    retryableExceptions.put(AwsServiceException.class, true);
+    retryableExceptions.put(RetryableException.class, true);
 
     retryTemplate.setRetryPolicy(new SimpleRetryPolicy(Integer.MAX_VALUE, retryableExceptions));
 

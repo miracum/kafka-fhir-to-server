@@ -5,10 +5,7 @@ import ca.uhn.fhir.fhirpath.IFhirPath;
 import ca.uhn.fhir.okhttp.client.OkHttpRestfulClientFactory;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
-import io.minio.MinioClient;
-import io.minio.credentials.AwsEnvironmentProvider;
-import io.minio.credentials.Provider;
-import io.minio.credentials.StaticProvider;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import okhttp3.OkHttpClient;
 import org.hl7.fhir.r4.hapi.fluentpath.FhirPathR4;
@@ -16,6 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.services.s3.*;
 
 @Configuration
 public class Config {
@@ -64,19 +66,26 @@ public class Config {
 
   @Bean
   @ConditionalOnProperty(prefix = "s3", name = "enabled", havingValue = "true")
-  MinioClient minioClient(S3Config config) {
-    Provider credentialsProvider;
+  S3Client s3Client(S3Config config) throws URISyntaxException {
+    AwsCredentialsProvider credentialsProvider = null;
 
     if (config.accessKey().isPresent() && config.secretKey().isPresent()) {
-      credentialsProvider =
-          new StaticProvider(config.accessKey().get(), config.secretKey().get(), null);
+      var credentials =
+          AwsBasicCredentials.create(config.accessKey().get(), config.secretKey().get());
+      credentialsProvider = StaticCredentialsProvider.create(credentials);
     } else {
-      credentialsProvider = new AwsEnvironmentProvider();
+      credentialsProvider = EnvironmentVariableCredentialsProvider.create();
     }
 
-    return MinioClient.builder()
-        .credentialsProvider(credentialsProvider)
-        .endpoint(config.endpointUrl())
-        .build();
+    var builder =
+        S3Client.builder()
+            .region(config.region())
+            .endpointOverride(config.endpointUrl().toURI())
+            .forcePathStyle(config.forcePathStyle())
+            .overrideConfiguration(
+                b -> b.apiCallTimeout(Duration.ofSeconds(config.timeoutSeconds())))
+            .credentialsProvider(credentialsProvider);
+
+    return builder.build();
   }
 }
