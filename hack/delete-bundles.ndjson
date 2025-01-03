@@ -1,0 +1,3 @@
+{"resourceType":"Bundle","type":"batch","entry":[{"request":{"method":"DELETE","url":"Encounter/cid.108"}}]}
+{"resourceType":"Bundle","type":"batch","entry":[{"request":{"method":"DELETE","url":"Observation/id-6457799fed46dffc"}}]}
+{"resourceType":"Bundle","type":"batch","entry":[{"request":{"method":"DELETE","url":"Patient/pid.999"}}]}
