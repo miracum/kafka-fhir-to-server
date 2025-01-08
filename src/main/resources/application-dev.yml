@@ -1,12 +1,6 @@
 spring:
   kafka:
     bootstrapServers: localhost:9094
-  cloud:
-    stream:
-      function.definition: sink
-      bindings:
-        sink-in-0:
-          destination: fhir-msg
 fhir:
   url: http://localhost:8082/fhir
   filter:
@@ -22,7 +16,7 @@ fhir:
     bundle-max-size: 25
 
 s3:
-  enabled: false
+  enabled: true
   endpoint-url: "http://localhost:9000"
   access-key: "admin"
   secret-key: "miniopass"
