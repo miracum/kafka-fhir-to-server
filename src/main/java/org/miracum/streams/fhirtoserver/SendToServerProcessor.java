@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
+import org.springframework.messaging.Message;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
@@ -239,8 +240,10 @@ public class SendToServerProcessor {
   }
 
   @Bean
-  Consumer<Resource> sinkSingle() {
-    return resource -> {
+  Consumer<Message<Resource>> sinkSingle() {
+    return message -> {
+      var resource = message.getPayload();
+
       if (resource == null) {
         LOG.warn("resource is null. Ignoring.");
         messageNullCounter.increment();
@@ -264,7 +267,7 @@ public class SendToServerProcessor {
       if (s3Config.enabled()) {
         LOG.debug("Sending bundle to object storage");
         try {
-          retryTemplate.execute(context -> s3Store.storeBatch(List.of(bundle)));
+          retryTemplate.execute(context -> s3Store.storeSingleBundle(bundle, message.getHeaders()));
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
