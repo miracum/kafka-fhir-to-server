@@ -6,7 +6,7 @@ import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.util.BundleUtil;
 import io.micrometer.common.lang.Nullable;
 import java.io.IOException;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,7 +45,8 @@ public class S3BundleStore {
     this.mergerConfig = mergerConfig;
   }
 
-  public Void storeBatch(List<Bundle> bundles) throws DataFormatException, IOException {
+  public Void storeBatch(List<Bundle> bundles, MessageHeaders headers)
+      throws DataFormatException, IOException {
     // start by merging all those bundles split into POST/PUT and DELETE bundles
     var mergedBundle =
         merger.mergeSeperateDeleteBundles(
@@ -67,10 +68,16 @@ public class S3BundleStore {
       var ndjson = listOfResourcesToNdjson(entry.getValue());
 
       var prefix = config.objectNamePrefix().orElse("");
+      var startTimestamp =
+          (Long) headers.get(KafkaHeaders.RECEIVED_TIMESTAMP, ArrayList.class).getFirst();
+      // in Spring Kafka all messages in a batch are from the same partition
+      var partition =
+          (Integer) headers.get(KafkaHeaders.RECEIVED_PARTITION, ArrayList.class).getFirst();
+      var startOffset = (Long) headers.get(KafkaHeaders.OFFSET, ArrayList.class).getFirst();
 
       var objectKey =
           String.format(
-              "%s%s/bundle-%s.ndjson", prefix, resourceType, Instant.now().toEpochMilli());
+              "%s%s/%s-%s-%s.ndjson", prefix, resourceType, startTimestamp, partition, startOffset);
 
       LOG.debug(
           "Storing {} resources of type {} as object {}",
@@ -79,11 +86,25 @@ public class S3BundleStore {
           objectKey);
 
       var body = RequestBody.fromString(ndjson);
+      var metadata =
+          Map.of(
+              "kafka-timestamp",
+              startTimestamp.toString(),
+              "kafka-partition",
+              partition.toString(),
+              "kafka-offset",
+              startOffset.toString(),
+              "kafka-topic",
+              (String) headers.get(KafkaHeaders.RECEIVED_TOPIC, ArrayList.class).getFirst(),
+              "kafka-group-id",
+              headers.getOrDefault(KafkaHeaders.GROUP_ID, "").toString());
+
       s3Client.putObject(
           request ->
               request
                   .bucket(config.bucketName())
                   .key(objectKey)
+                  .metadata(metadata)
                   .contentType(Constants.CT_FHIR_NDJSON),
           body);
     }
@@ -95,7 +116,7 @@ public class S3BundleStore {
         mergedBundle.deletBundle().getEntry().stream()
             .collect(Collectors.groupingBy(e -> e.getRequest().getUrl().split("/")[0]));
 
-    storeDeleteBundles(groupedDeletes);
+    storeDeleteBundles(groupedDeletes, headers);
 
     return null;
   }
@@ -117,7 +138,8 @@ public class S3BundleStore {
     }
   }
 
-  private void storeDeleteBundles(Map<String, List<BundleEntryComponent>> groupedDeletes) {
+  private void storeDeleteBundles(
+      Map<String, List<BundleEntryComponent>> groupedDeletes, MessageHeaders headers) {
     LOG.debug(
         "Storing {} delete requests in buckets ({})",
         groupedDeletes.size(),
@@ -145,9 +167,16 @@ public class S3BundleStore {
 
       var prefix = config.objectNamePrefix().orElse("");
 
+      var startTimestamp =
+          (Long) headers.get(KafkaHeaders.RECEIVED_TIMESTAMP, ArrayList.class).getFirst();
+      // in Spring Kafka all messages in a batch are from the same partition
+      var partition = (Long) headers.get(KafkaHeaders.PARTITION, ArrayList.class).getFirst();
+      var startOffset = (Long) headers.get(KafkaHeaders.OFFSET, ArrayList.class).getFirst();
+
       var objectKey =
           String.format(
-              "%s%s/_delete/bundle-%s.json", prefix, resourceType, Instant.now().toEpochMilli());
+              "%s%s/_delete/%s-%s-%s.ndjson",
+              prefix, resourceType, startTimestamp, partition, startOffset);
 
       LOG.debug(
           "Storing delete bundle with {} entries as object {}",
@@ -206,8 +235,6 @@ public class S3BundleStore {
               offset.toString(),
               "kafka-topic",
               messageHeaders.getOrDefault(KafkaHeaders.RECEIVED_TOPIC, "").toString(),
-              "kafka-key",
-              messageHeaders.getOrDefault(KafkaHeaders.RECEIVED_KEY, "").toString(),
               "kafka-group-id",
               messageHeaders.getOrDefault(KafkaHeaders.GROUP_ID, "").toString());
 

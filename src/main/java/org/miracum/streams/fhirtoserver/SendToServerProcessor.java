@@ -165,13 +165,15 @@ public class SendToServerProcessor {
   }
 
   @Bean
-  Consumer<List<Resource>> sinkBatch() {
-    return resourceBatch -> {
-      if (resourceBatch == null) {
+  Consumer<Message<List<Resource>>> sinkBatch() {
+    return messageBatch -> {
+      if (messageBatch == null) {
         LOG.warn("resource is null. Ignoring.");
         messageNullCounter.increment();
         return;
       }
+
+      var resourceBatch = messageBatch.getPayload();
 
       if (resourceBatch.isEmpty()) {
         LOG.warn("received batch is empty. Ignoring.");
@@ -193,7 +195,8 @@ public class SendToServerProcessor {
       if (s3Config.enabled()) {
         LOG.debug("Sending all bundles to object storage as merged bundles");
         try {
-          retryTemplate.execute(context -> s3Store.storeBatch(allBundlesInBatch));
+          retryTemplate.execute(
+              context -> s3Store.storeBatch(allBundlesInBatch, messageBatch.getHeaders()));
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
