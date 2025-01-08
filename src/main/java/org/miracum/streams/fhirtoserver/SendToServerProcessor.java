@@ -242,13 +242,13 @@ public class SendToServerProcessor {
   @Bean
   Consumer<Message<Resource>> sinkSingle() {
     return message -> {
-      var resource = message.getPayload();
-
-      if (resource == null) {
-        LOG.warn("resource is null. Ignoring.");
+      if (message == null) {
+        LOG.warn("message is null. Ignoring.");
         messageNullCounter.increment();
         return;
       }
+
+      var resource = message.getPayload();
 
       if (!(resource instanceof Bundle bundle)) {
         LOG.warn("Can only process resources of type Bundle. Ignoring.");
