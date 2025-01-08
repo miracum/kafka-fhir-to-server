@@ -76,7 +76,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,prometheus"
   health:
     livenessstate:
       enabled: true
