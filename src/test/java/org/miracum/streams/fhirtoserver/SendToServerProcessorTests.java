@@ -28,6 +28,7 @@ class SendToServerProcessorTests {
 
   @Test
   void process_withNullResource_shouldNotThrow() {
-    assertDoesNotThrow(() -> sut.sink().accept(null));
+    assertDoesNotThrow(() -> sut.sinkBatch().accept(null));
+    assertDoesNotThrow(() -> sut.sinkSingle().accept(null));
   }
 }

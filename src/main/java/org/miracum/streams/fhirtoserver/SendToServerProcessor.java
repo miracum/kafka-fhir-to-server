@@ -164,7 +164,7 @@ public class SendToServerProcessor {
   }
 
   @Bean
-  Consumer<List<Resource>> sink() {
+  Consumer<List<Resource>> sinkBatch() {
     return resourceBatch -> {
       if (resourceBatch == null) {
         LOG.warn("resource is null. Ignoring.");
@@ -213,10 +213,10 @@ public class SendToServerProcessor {
               fhirBundleMerger.partitionBundle(
                   mergedBundle, batchMergingConfig.bundleMaxSize().get());
           for (var bundle : partitionedBundles) {
-            sendSingleBundle(bundle);
+            sendSingleBundleToServer(bundle);
           }
         } else {
-          sendSingleBundle(mergedBundle);
+          sendSingleBundleToServer(mergedBundle);
         }
       } else {
         LOG.debug("Sending all bundles in batch one by one");
@@ -232,13 +232,50 @@ public class SendToServerProcessor {
             MDC.put("bundleFirstEntryType", firstEntryResource.getResourceType().name());
           }
 
-          sendSingleBundle(bundle);
+          sendSingleBundleToServer(bundle);
         }
       }
     };
   }
 
-  void sendSingleBundle(Bundle bundle) {
+  @Bean
+  Consumer<Resource> sinkSingle() {
+    return resource -> {
+      if (resource == null) {
+        LOG.warn("resource is null. Ignoring.");
+        messageNullCounter.increment();
+        return;
+      }
+
+      if (!(resource instanceof Bundle bundle)) {
+        LOG.warn("Can only process resources of type Bundle. Ignoring.");
+        unsupportedResourceTypeCounter.increment();
+        return;
+      }
+
+      if (bundle.getEntry().isEmpty()) {
+        LOG.warn("received batch is empty. Ignoring.");
+        messageEmptyCounter.increment();
+        return;
+      }
+
+      LOG.debug("Processing single bundle {}", kv("bundleId", bundle.getId()));
+
+      if (s3Config.enabled()) {
+        LOG.debug("Sending bundle to object storage");
+        try {
+          retryTemplate.execute(context -> s3Store.storeBatch(List.of(bundle)));
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        LOG.debug("Sending single bundle");
+        sendSingleBundleToServer(bundle);
+      }
+    };
+  }
+
+  void sendSingleBundleToServer(Bundle bundle) {
     if (overrideBundleType != null) {
       bundle.setType(overrideBundleType);
     }
