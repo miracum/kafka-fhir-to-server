@@ -52,7 +52,8 @@ public class S3BundleStore {
         merger.mergeSeperateDeleteBundles(
             bundles, mergerConfig.entryUniquenessFhirpathExpression());
 
-    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the DELETE entries)
+    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the
+    // DELETE entries)
     var resources = BundleUtil.toListOfResources(fhirContext, mergedBundle.bundle());
 
     var grouped = resources.stream().collect(Collectors.groupingBy(IBaseResource::fhirType));
@@ -171,7 +172,7 @@ public class S3BundleStore {
           (Long) headers.get(KafkaHeaders.RECEIVED_TIMESTAMP, ArrayList.class).getFirst();
       // in Spring Kafka all messages in a batch are from the same partition
       var partition =
-          (Long) headers.get(KafkaHeaders.RECEIVED_PARTITION, ArrayList.class).getFirst();
+          (Integer) headers.get(KafkaHeaders.RECEIVED_PARTITION, ArrayList.class).getFirst();
       var startOffset = (Long) headers.get(KafkaHeaders.OFFSET, ArrayList.class).getFirst();
 
       var objectKey =
@@ -201,7 +202,8 @@ public class S3BundleStore {
         merger.mergeSeperateDeleteBundles(
             List.of(bundle), mergerConfig.entryUniquenessFhirpathExpression());
 
-    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the DELETE entries)
+    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the
+    // DELETE entries)
     var resources = BundleUtil.toListOfResources(fhirContext, mergedBundle.bundle());
 
     var grouped = resources.stream().collect(Collectors.groupingBy(IBaseResource::fhirType));
