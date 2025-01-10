@@ -170,7 +170,8 @@ public class S3BundleStore {
       var startTimestamp =
           (Long) headers.get(KafkaHeaders.RECEIVED_TIMESTAMP, ArrayList.class).getFirst();
       // in Spring Kafka all messages in a batch are from the same partition
-      var partition = (Long) headers.get(KafkaHeaders.PARTITION, ArrayList.class).getFirst();
+      var partition =
+          (Long) headers.get(KafkaHeaders.RECEIVED_PARTITION, ArrayList.class).getFirst();
       var startOffset = (Long) headers.get(KafkaHeaders.OFFSET, ArrayList.class).getFirst();
 
       var objectKey =
