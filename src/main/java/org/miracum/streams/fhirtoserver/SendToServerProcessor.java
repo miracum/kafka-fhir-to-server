@@ -274,7 +274,9 @@ public class SendToServerProcessor {
         return;
       }
 
-      distinctBundleIds.add(bundle.getId());
+      if (bundle.hasId()) {
+        distinctBundleIds.add(bundle.getId());
+      }
 
       if (bundle.getEntry().isEmpty()) {
         LOG.warn("received batch is empty. Ignoring.");
