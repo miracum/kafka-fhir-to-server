@@ -6,15 +6,19 @@ import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.util.BundleUtil;
 import io.micrometer.common.lang.Nullable;
 import java.io.IOException;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -41,13 +45,15 @@ public class S3BundleStore {
     this.mergerConfig = mergerConfig;
   }
 
-  public Void storeBatch(List<Bundle> bundles) throws DataFormatException, IOException {
+  public Void storeBatch(List<Bundle> bundles, MessageHeaders headers)
+      throws DataFormatException, IOException {
     // start by merging all those bundles split into POST/PUT and DELETE bundles
     var mergedBundle =
         merger.mergeSeperateDeleteBundles(
             bundles, mergerConfig.entryUniquenessFhirpathExpression());
 
-    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the DELETE entries)
+    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the
+    // DELETE entries)
     var resources = BundleUtil.toListOfResources(fhirContext, mergedBundle.bundle());
 
     var grouped = resources.stream().collect(Collectors.groupingBy(IBaseResource::fhirType));
@@ -58,42 +64,51 @@ public class S3BundleStore {
         grouped.size(),
         grouped.keySet());
 
-    var parser = fhirContext.newJsonParser();
+    var startTimestamp =
+        (Long) headers.get(KafkaHeaders.RECEIVED_TIMESTAMP, ArrayList.class).getFirst();
+    // in Spring Kafka all messages in a batch are from the same partition
+    var partition =
+        (Integer) headers.get(KafkaHeaders.RECEIVED_PARTITION, ArrayList.class).getFirst();
+    var startOffset = (Long) headers.get(KafkaHeaders.OFFSET, ArrayList.class).getFirst();
+    var metadata =
+        Map.of(
+            "kafka-timestamp",
+            startTimestamp.toString(),
+            "kafka-partition",
+            partition.toString(),
+            "kafka-offset",
+            startOffset.toString(),
+            "kafka-topic",
+            (String) headers.get(KafkaHeaders.RECEIVED_TOPIC, ArrayList.class).getFirst(),
+            "kafka-group-id",
+            headers.getOrDefault(KafkaHeaders.GROUP_ID, "").toString());
 
     for (var entry : grouped.entrySet()) {
-      try (var stringWriter = new StringBuilderWriter()) {
-        var resourceType = entry.getKey();
-        boolean isFirstResource = true;
-        for (var resource : entry.getValue()) {
-          if (!(isFirstResource)) {
-            stringWriter.write("\n");
-          }
-          isFirstResource = false;
+      var resourceType = entry.getKey();
+      var ndjson = listOfResourcesToNdjson(entry.getValue());
 
-          parser.encodeResourceToWriter(resource, stringWriter);
-        }
+      var prefix = config.objectNamePrefix().orElse("");
 
-        var prefix = config.objectNamePrefix().orElse("");
+      var objectKey =
+          String.format(
+              "%s%s/%s-%s-%s.ndjson", prefix, resourceType, startTimestamp, partition, startOffset);
 
-        var objectKey =
-            String.format(
-                "%s%s/bundle-%s.ndjson", prefix, resourceType, Instant.now().toEpochMilli());
+      LOG.debug(
+          "Storing {} resources of type {} as object {}",
+          entry.getValue().size(),
+          entry.getKey(),
+          objectKey);
 
-        LOG.debug(
-            "Storing {} resources of type {} as object {}",
-            entry.getValue().size(),
-            entry.getKey(),
-            objectKey);
+      var body = RequestBody.fromString(ndjson);
 
-        var body = RequestBody.fromString(stringWriter.toString());
-        s3Client.putObject(
-            request ->
-                request
-                    .bucket(config.bucketName())
-                    .key(objectKey)
-                    .contentType(Constants.CT_FHIR_NDJSON),
-            body);
-      }
+      s3Client.putObject(
+          request ->
+              request
+                  .bucket(config.bucketName())
+                  .key(objectKey)
+                  .metadata(metadata)
+                  .contentType(Constants.CT_FHIR_NDJSON),
+          body);
     }
 
     // now, deal with the DELETE entries
@@ -103,18 +118,49 @@ public class S3BundleStore {
         mergedBundle.deletBundle().getEntry().stream()
             .collect(Collectors.groupingBy(e -> e.getRequest().getUrl().split("/")[0]));
 
+    storeDeleteBundles(groupedDeletes, headers, metadata);
+
+    return null;
+  }
+
+  private String listOfResourcesToNdjson(List<IBaseResource> resources)
+      throws DataFormatException, IOException {
+    var parser = fhirContext.newJsonParser();
+    boolean isFirstResource = true;
+    try (var stringWriter = new StringBuilderWriter()) {
+      for (var resource : resources) {
+        if (!(isFirstResource)) {
+          stringWriter.write("\n");
+        }
+        isFirstResource = false;
+
+        parser.encodeResourceToWriter(resource, stringWriter);
+      }
+      return stringWriter.toString();
+    }
+  }
+
+  private void storeDeleteBundles(
+      Map<String, List<BundleEntryComponent>> groupedDeletes,
+      MessageHeaders headers,
+      Map<String, String> metadata) {
     LOG.debug(
         "Storing {} delete requests in buckets ({})",
         groupedDeletes.size(),
         groupedDeletes.keySet());
 
+    var parser = fhirContext.newJsonParser();
+
     // each entry is one resource type
     for (var entry : groupedDeletes.entrySet()) {
+      LOG.debug("Processing resource type {}", entry.getKey());
+
       var deleteBundle = new Bundle();
       deleteBundle.setType(BundleType.TRANSACTION);
 
       // turns all entries of the merged bundles into a single one
       // per resource type
+      // Note that this is not an NDJSON but instead a regular bundle
       for (var bundleEntry : entry.getValue()) {
         deleteBundle.addEntry().setRequest(bundleEntry.getRequest());
       }
@@ -125,9 +171,17 @@ public class S3BundleStore {
 
       var prefix = config.objectNamePrefix().orElse("");
 
+      var startTimestamp =
+          (Long) headers.get(KafkaHeaders.RECEIVED_TIMESTAMP, ArrayList.class).getFirst();
+      // in Spring Kafka all messages in a batch are from the same partition
+      var partition =
+          (Integer) headers.get(KafkaHeaders.RECEIVED_PARTITION, ArrayList.class).getFirst();
+      var startOffset = (Long) headers.get(KafkaHeaders.OFFSET, ArrayList.class).getFirst();
+
       var objectKey =
           String.format(
-              "%s%s/_delete/bundle-%s.json", prefix, resourceType, Instant.now().toEpochMilli());
+              "%s%s/_delete/%s-%s-%s.ndjson",
+              prefix, resourceType, startTimestamp, partition, startOffset);
 
       LOG.debug(
           "Storing delete bundle with {} entries as object {}",
@@ -140,9 +194,69 @@ public class S3BundleStore {
               request
                   .bucket(config.bucketName())
                   .key(objectKey)
+                  .metadata(metadata)
                   .contentType(Constants.CT_FHIR_JSON_NEW),
           body);
     }
+  }
+
+  public Void storeSingleBundle(Bundle bundle, MessageHeaders messageHeaders)
+      throws DataFormatException, IOException {
+    var mergedBundle =
+        merger.mergeSeperateDeleteBundles(
+            List.of(bundle), mergerConfig.entryUniquenessFhirpathExpression());
+
+    // extract all POST/PUT bundle entries (mergedBundle.deleteBundle() contains the
+    // DELETE entries)
+    var resources = BundleUtil.toListOfResources(fhirContext, mergedBundle.bundle());
+
+    var grouped = resources.stream().collect(Collectors.groupingBy(IBaseResource::fhirType));
+
+    for (var entry : grouped.entrySet()) {
+      var resourceType = entry.getKey();
+      var ndjson = listOfResourcesToNdjson(entry.getValue());
+
+      var prefix = config.objectNamePrefix().orElse("");
+
+      var timestamp = messageHeaders.get(KafkaHeaders.RECEIVED_TIMESTAMP);
+      var partition = messageHeaders.get(KafkaHeaders.RECEIVED_PARTITION);
+      var offset = messageHeaders.get(KafkaHeaders.OFFSET);
+
+      var objectKey =
+          String.format("%s%s/%s-%s-%s.ndjson", prefix, resourceType, timestamp, partition, offset);
+
+      LOG.debug(
+          "Storing {} resources of type {} as object {}",
+          entry.getValue().size(),
+          entry.getKey(),
+          objectKey);
+
+      var body = RequestBody.fromString(ndjson);
+      var metadata =
+          Map.of(
+              "kafka-timestamp",
+              timestamp.toString(),
+              "kafka-partition",
+              partition.toString(),
+              "kafka-offset",
+              offset.toString(),
+              "kafka-topic",
+              messageHeaders.getOrDefault(KafkaHeaders.RECEIVED_TOPIC, "").toString(),
+              "kafka-group-id",
+              messageHeaders.getOrDefault(KafkaHeaders.GROUP_ID, "").toString());
+
+      s3Client.putObject(
+          request ->
+              request
+                  .bucket(config.bucketName())
+                  .key(objectKey)
+                  .metadata(metadata)
+                  .contentType(Constants.CT_FHIR_NDJSON),
+          body);
+    }
+
+    // TODO: DELETE bundle entries are not handled here yet
+
     return null;
   }
 }
