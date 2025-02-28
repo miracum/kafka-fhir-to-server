@@ -43,6 +43,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.RetryableException;
+import software.amazon.awssdk.core.exception.SdkClientException;
 
 @Configuration
 @Service
@@ -136,6 +137,7 @@ public class SendToServerProcessor {
     retryableExceptions.put(IOException.class, true);
     retryableExceptions.put(AwsServiceException.class, true);
     retryableExceptions.put(RetryableException.class, true);
+    retryableExceptions.put(SdkClientException.class, true);
 
     retryTemplate.setRetryPolicy(new SimpleRetryPolicy(Integer.MAX_VALUE, retryableExceptions));
 
