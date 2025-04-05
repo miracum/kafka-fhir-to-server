@@ -11,7 +11,7 @@ services:
       - 127.0.0.1:8082:8080
 
   kafka:
-    image: docker.io/bitnami/kafka:3.9.0@sha256:3fb376e32af41bab0ad5d891b9749b69b0e500b285e0f3a6fc500affa5f29fb3
+    image: docker.io/bitnami/kafka:4.0.0@sha256:89b1fabfe2fc7b723d33cadf2bd5a32c554719f1b928e99d78aa174d80becd4b
     restart: unless-stopped
     cap_drop:
       - ALL
