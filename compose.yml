@@ -62,7 +62,7 @@ services:
       - kafka
 
   minio:
-    image: docker.io/bitnami/minio:2024.12.18-debian-12-r1@sha256:c0ede65eb88e47138470202c517bacf55ab3c27df848030b7b46e69d34b7d192
+    image: docker.io/bitnami/minio:2025.4.3-debian-12-r1@sha256:e591c02a75cbd62f8cfb3506f2d9da98ff474496a78263e369fbf578cf8ffbfc
     environment:
       MINIO_ROOT_USER: "admin"
       # kics-scan ignore-line
