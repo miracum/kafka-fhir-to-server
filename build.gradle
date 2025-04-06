@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.4.1'
+    id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'jacoco'
@@ -26,7 +26,7 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', '2024.0.0')
+    set('springCloudVersion', '2024.0.1')
     set('hapiVersion', '7.6.1')
 }
 
@@ -40,12 +40,12 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.2'
-    implementation 'io.micrometer:micrometer-core:1.14.2'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.5'
+    implementation 'io.micrometer:micrometer-core:1.14.5'
 
     implementation 'org.miracum:kafka-fhir-serializer:1.0.8'
 
-    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 
     implementation "ca.uhn.hapi.fhir:hapi-fhir-base:${hapiVersion}"
     implementation "ca.uhn.hapi.fhir:hapi-fhir-client:${hapiVersion}"
@@ -54,11 +54,11 @@ dependencies {
     implementation "ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:${hapiVersion}"
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.3'
 
     implementation 'org.fhir:ucum:1.0.9'
 
-    implementation platform("software.amazon.awssdk:bom:2.29.45")
+    implementation platform("software.amazon.awssdk:bom:2.31.16")
     implementation "software.amazon.awssdk:s3"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -87,7 +87,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 
 spotless {

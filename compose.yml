@@ -49,7 +49,7 @@ services:
       - kafka
 
   mock-data-loader:
-    image: docker.io/confluentinc/cp-kafkacat:7.1.15@sha256:273c2022aee0cfc0a181acf1801912c45b0e1fb62785711ab2ca64065d072fc7
+    image: docker.io/confluentinc/cp-kafkacat:7.1.16@sha256:ce6f7079c7463572e62a8fbf0fa2af124e2687f679e64966081d6b339a604b10
     entrypoint: ["/bin/bash", "-c"]
     restart: on-failure
     command:
@@ -62,7 +62,7 @@ services:
       - kafka
 
   minio:
-    image: docker.io/bitnami/minio:2024.12.18-debian-12-r0@sha256:cce234b4381a169d80836584d966bb5c82365e5f7f0becfcf2d1cf8c57be754b
+    image: docker.io/bitnami/minio:2024.12.18-debian-12-r1@sha256:c0ede65eb88e47138470202c517bacf55ab3c27df848030b7b46e69d34b7d192
     environment:
       MINIO_ROOT_USER: "admin"
       # kics-scan ignore-line
