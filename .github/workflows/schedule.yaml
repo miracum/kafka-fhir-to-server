@@ -6,11 +6,12 @@ on:
   schedule:
     - cron: "00 11 * * *"
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   schedule:
-    uses: miracum/.github/.github/workflows/standard-schedule.yaml@abfae5033f23299a721ddda53263e32d18f33d8a # v1.12.12
+    uses: miracum/.github/.github/workflows/standard-schedule.yaml@f4c8b63f01be62f28729c15d6ddffebeb0725fc8 # v1.16.9
     permissions:
       contents: read
       issues: write
