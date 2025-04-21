@@ -6,7 +6,8 @@ on:
   schedule:
     - cron: "00 11 * * *"
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   schedule:
