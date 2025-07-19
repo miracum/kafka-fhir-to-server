@@ -35,7 +35,7 @@ services:
       - 127.0.0.1:9094:9094
 
   akhq:
-    image: docker.io/tchiotludo/akhq:0.25.1@sha256:cfaef8f419c4e4b78c583597d6428b63166e90eeb194af890264d68051a22180
+    image: docker.io/tchiotludo/akhq:0.26.0@sha256:833f9c3c32786e06c858589b2b1655a60caf3ca235c840308ad5754414945dd0
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -62,7 +62,7 @@ services:
       - kafka
 
   minio:
-    image: docker.io/bitnami/minio:2025.4.3-debian-12-r1@sha256:e591c02a75cbd62f8cfb3506f2d9da98ff474496a78263e369fbf578cf8ffbfc
+    image: docker.io/bitnami/minio:2025.7.18-debian-12-r0@sha256:7ca49beb7c158c93dccf45105e98a5395e1c54a3cb7b82cd806e3821daa25701
     environment:
       MINIO_ROOT_USER: "admin"
       # kics-scan ignore-line
