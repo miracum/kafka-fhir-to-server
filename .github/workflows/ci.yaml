@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   build:
-    uses: miracum/.github/.github/workflows/standard-build.yaml@563959ec1b63f91b8d12a170152b4537f1b43ba8 # v1.16.14
+    uses: miracum/.github/.github/workflows/standard-build.yaml@05947adeb93f393561f9f2cc7998f5c81670b7ac # v1.16.26
     permissions:
       contents: write
       id-token: write
@@ -51,7 +51,7 @@ jobs:
           docker info -f '{{ .DriverStatus }}'
 
       - name: "Checkout code"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           persist-credentials: false
 
@@ -85,7 +85,7 @@ jobs:
           docker compose -f compose.yml -f tests/e2e/compose.yml down --volumes --remove-orphans
 
   lint:
-    uses: miracum/.github/.github/workflows/standard-lint.yaml@563959ec1b63f91b8d12a170152b4537f1b43ba8 # v1.16.14
+    uses: miracum/.github/.github/workflows/standard-lint.yaml@05947adeb93f393561f9f2cc7998f5c81670b7ac # v1.16.26
     permissions:
       contents: read
       pull-requests: write
@@ -100,7 +100,7 @@ jobs:
       github-token: ${{ secrets.GITHUB_TOKEN }}
 
   release:
-    uses: miracum/.github/.github/workflows/standard-release.yaml@563959ec1b63f91b8d12a170152b4537f1b43ba8 # v1.16.14
+    uses: miracum/.github/.github/workflows/standard-release.yaml@05947adeb93f393561f9f2cc7998f5c81670b7ac # v1.16.26
     needs:
       - build
     permissions:
