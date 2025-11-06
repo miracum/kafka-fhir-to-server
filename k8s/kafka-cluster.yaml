@@ -1,16 +1,30 @@
 apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  replicas: 1
+  roles:
+    - controller
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: 8Gi
+        deleteClaim: false
+---
+apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: my-cluster
 spec:
   kafka:
-    version: 3.4.0
-    replicas: 1
+    version: 4.1.0
     listeners:
-      - name: plain
-        port: 9092
-        type: internal
-        tls: false
       - name: tls
         port: 9093
         type: internal
@@ -19,11 +33,13 @@ spec:
       offsets.topic.replication.factor: 1
       transaction.state.log.replication.factor: 1
       transaction.state.log.min.isr: 1
-    storage:
-      type: ephemeral
-  zookeeper:
-    replicas: 1
-    storage:
-      type: ephemeral
+      num.partitions: 1
+      auto.create.topics.enable: true
+      default.replication.factor: 1
+      log.cleanup.policy: compact
+      # 30 MiB
+      message.max.bytes: 31457280
+      # https://kafka.apache.org/documentation/#brokerconfigs_compression.type
+      compression.type: gzip
   entityOperator:
     userOperator: {}

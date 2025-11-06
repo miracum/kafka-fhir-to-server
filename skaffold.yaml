@@ -23,7 +23,7 @@ manifests:
       - name: akhq
         remoteChart: akhq
         repo: https://akhq.io/
-        version: 0.24.0
+        version: 0.26.0
         skipBuildDependencies: true
         wait: true
         valuesFiles:
@@ -31,7 +31,7 @@ manifests:
       - name: hapi-fhir-jpaserver
         remoteChart: hapi-fhir-jpaserver
         repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter
-        version: 0.11.0
+        version: 0.21.0
         skipBuildDependencies: true
         wait: true
         setValues:
@@ -40,7 +40,7 @@ manifests:
       - name: stream-processors
         remoteChart: stream-processors
         repo: https://miracum.github.io/charts
-        version: 1.1.8
+        version: 1.11.2
         skipBuildDependencies: true
         wait: true
         valuesFiles:

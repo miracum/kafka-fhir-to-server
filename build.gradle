@@ -11,7 +11,7 @@ version = '3.0.8'
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(21)
+    languageVersion = JavaLanguageVersion.of(25)
   }
 }
 
@@ -58,8 +58,8 @@ dependencies {
 
     implementation 'org.fhir:ucum:1.0.10'
 
-    implementation platform("software.amazon.awssdk:bom:2.37.5")
-    implementation "software.amazon.awssdk:s3"
+    implementation platform('software.amazon.awssdk:bom:2.37.5')
+    implementation 'software.amazon.awssdk:s3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

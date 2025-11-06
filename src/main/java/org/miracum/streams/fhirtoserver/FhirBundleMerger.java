@@ -26,7 +26,7 @@ public class FhirBundleMerger {
   }
 
   public Bundle merge(List<Bundle> bundles) {
-    return this.merge(bundles, "fullUrl.toString()");
+    return this.merge(bundles, "request.url.toString()");
   }
 
   public Bundle merge(List<Bundle> bundles, String fhirPathExpression) {
