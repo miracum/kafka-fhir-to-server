@@ -1,20 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>miracum/.github//renovate/default",
-    "schedule:quarterly"
-  ],
-  "ignorePaths": [
-    "**/node_modules/**",
-    "**/bower_components/**",
-    "fhir/**"
-  ],
+  "extends": ["github>miracum/.github//renovate/default", "schedule:quarterly"],
+  "ignorePaths": ["**/node_modules/**", "**/bower_components/**", "fhir/**"],
   "pip-compile": {
-    "managerFilePatterns": [
-      "/(^|/|\\.)requirements\\.txt$/"
-    ]
+    "managerFilePatterns": ["/(^|/|\\.)requirements\\.txt$/"]
   },
-  "ignoreDeps": [
-    "ghcr.io/miracum/kafka-fhir-to-server"
-  ]
+  "ignoreDeps": ["ghcr.io/miracum/kafka-fhir-to-server"]
 }

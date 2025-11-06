@@ -39,6 +39,30 @@ See [application.yml](src/main/resources/application.yml) for more options.
 | `S3_BUCKET_NAME`        | The name of the bucket to store the resources. The actual resources are grouped by their type and stored using the current epoch timestamp, e.g. `<S3_BUCKET_NAME>/Patient/bundle-123456.ndjson` | `"fhir"` |
 | `S3_OBJECT_NAME_PREFIX` | An optional prefix to prepend to the object name: `<S3_BUCKET_NAME><S3_OBJECT_NAME_PREFIX>Patient/bundle-123456.ndjson`                                                                          | `""`     |
 
+### Self-Signed Certificates
+
+If the FHIR server provides TLS via a custom CA, you can mount your own CA PKCS12 files and configure the JVM via the `JAVA_TOOL_OPTIONS` environment variable like so:
+
+```console
+JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/opt/myca/ca.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12
+```
+
+For example, if `${PWD}/my-ca/` contains the local ca.p12 file:
+
+```yaml
+services:
+  fhir-to-server:
+    image: ghcr.io/miracum/kafka-fhir-to-server
+    environment:
+      SECURITY_PROTOCOL: PLAINTEXT
+      BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: "-Djavax.net.ssl.trustStore=/opt/myca/ca.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12"
+      FHIR_URL: http://local-server:8080/fhir
+      TOPIC: my.fhir.input.topic
+    volumes:
+      - ${PWD}/my-ca/:/opt/myca/:ro
+```
+
 ## Observability
 
 The application publishes useful Prometheus metrics at `/actuator/prometheus`.

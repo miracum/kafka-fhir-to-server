@@ -11,7 +11,7 @@ services:
         condition: service_started
 
   wait-for-fhir-server:
-    image: docker.io/curlimages/curl:8.13.0@sha256:d43bdb28bae0be0998f3be83199bfb2b81e0a30b034b6d7586ce7e05de34c3fd
+    image: docker.io/curlimages/curl:8.17.0@sha256:1e809b44e4cdf8a64a1bfe37875d4758a39454d686c2ff3c4a0fbeda93aae519
     ipc: none
     security_opt:
       - "no-new-privileges:true"

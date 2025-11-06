@@ -16,7 +16,7 @@ fhir:
     bundle-max-size: 25
 
 s3:
-  enabled: true
+  enabled: false
   endpoint-url: "http://localhost:9000"
   access-key: "admin"
   secret-key: "miniopass"
