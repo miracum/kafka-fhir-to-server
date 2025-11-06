@@ -43,7 +43,7 @@ See [application.yml](src/main/resources/application.yml) for more options.
 
 If the FHIR server provides TLS via a custom CA, you can mount your own CA PKCS12 files and configure the JVM via the `JAVA_TOOL_OPTIONS` environment variable like so:
 
-```
+```console
 JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/opt/myca/ca.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12
 ```
 
