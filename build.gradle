@@ -40,8 +40,8 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.15.5'
-    implementation 'io.micrometer:micrometer-core:1.15.5'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.0'
+    implementation 'io.micrometer:micrometer-core:1.16.0'
 
     implementation 'org.miracum:kafka-fhir-serializer:2.0.6'
 
@@ -58,7 +58,7 @@ dependencies {
 
     implementation 'org.fhir:ucum:1.0.10'
 
-    implementation platform('software.amazon.awssdk:bom:2.37.5')
+    implementation platform('software.amazon.awssdk:bom:2.38.0')
     implementation 'software.amazon.awssdk:s3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
