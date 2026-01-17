@@ -1,6 +1,6 @@
 # FHIR to Server
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/miracum/kafka-fhir-to-server/badge)](https://api.securityscorecards.dev/projects/github.com/miracum/kafka-fhir-to-server)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/miracum/kafka-fhir-to-server/badge)](https://scorecard.dev/viewer/?uri=github.com/miracum/kafka-fhir-to-server)
 
 > Reads FHIR Bundles from a Kafka topic and sends them to a FHIR server
 
