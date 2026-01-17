@@ -82,7 +82,7 @@ services:
       - "127.0.0.1:9001:9001"
 
   wait-for-minio:
-    image: ${IMAGE_REGISTRY_DOCKER_IO:-docker.io}/curlimages/curl:8.14.1@sha256:9a1ed35addb45476afa911696297f8e115993df459278ed036182dd2cd22b67b
+    image: docker.io/curlimages/curl:8.14.1@sha256:9a1ed35addb45476afa911696297f8e115993df459278ed036182dd2cd22b67b
     ipc: none
     security_opt:
       - "no-new-privileges:true"
@@ -104,7 +104,7 @@ services:
         condition: service_started
 
   create-default-bucket:
-    image: ${IMAGE_REGISTRY_DOCKER_IO:-docker.io}/minio/minio:RELEASE.2025-07-23T15-54-02Z@sha256:d249d1fb6966de4d8ad26c04754b545205ff15a62e4fd19ebd0f26fa5baacbc0
+    image: docker.io/minio/minio:RELEASE.2025-07-23T15-54-02Z@sha256:d249d1fb6966de4d8ad26c04754b545205ff15a62e4fd19ebd0f26fa5baacbc0
     restart: on-failure
     cap_drop:
       - ALL
