@@ -82,7 +82,7 @@ services:
       - "127.0.0.1:9001:9001"
 
   wait-for-minio:
-    image: docker.io/curlimages/curl:8.14.1@sha256:9a1ed35addb45476afa911696297f8e115993df459278ed036182dd2cd22b67b
+    image: docker.io/curlimages/curl:8.18.0@sha256:d94d07ba9e7d6de898b6d96c1a072f6f8266c687af78a74f380087a0addf5d17
     ipc: none
     security_opt:
       - "no-new-privileges:true"
