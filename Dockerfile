@@ -1,4 +1,4 @@
-FROM docker.io/library/gradle:9.3.0-jdk25@sha256:6b00e8f72944975742fc0d01fa45643a528bb8e2b31a51867ff2838dd4b2e1df AS build
+FROM docker.io/library/gradle:9.3.0-jdk25@sha256:2e614dffcc0266a28f70b323a3044472dfa75a7f6873d94a759a4fb785dc78da AS build
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 WORKDIR /home/gradle/project
 
@@ -16,7 +16,7 @@ WORKDIR /test
 COPY --from=build /home/gradle/project/build/reports/ .
 ENTRYPOINT [ "true" ]
 
-FROM gcr.io/distroless/java25-debian13:nonroot@sha256:70612f50341c5de9d3600493b18d074f2b0daad4f5b6003047fe9a5b4e3ece65
+FROM gcr.io/distroless/java25-debian13:nonroot@sha256:e1eeec12952b877762d2a0a94a216600b34056942f6d82635a1d4a5dc8ee9770
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/project/dependencies/ ./
 COPY --from=build /home/gradle/project/spring-boot-loader/ ./
