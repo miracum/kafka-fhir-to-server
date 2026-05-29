@@ -1,1 +1,3 @@
 rootProject.name = 'fhir-to-server'
+
+include 'e2e'

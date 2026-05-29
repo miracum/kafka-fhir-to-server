@@ -15,29 +15,19 @@ java {
   }
 }
 
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
 repositories {
     mavenCentral()
-}
-
-// E2E test source set - separate from unit tests
-sourceSets {
-    e2eTest {
-        java.srcDir 'src/e2eTest/java'
-        resources.srcDir 'src/e2eTest/resources'
-        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
-    }
-}
-
-configurations {
-    e2eTestImplementation.extendsFrom implementation
-    e2eTestRuntimeOnly.extendsFrom runtimeOnly
 }
 
 ext {
     set('springCloudVersion', '2025.1.1')
     set('hapiVersion', '8.6.5')
-    set('testcontainersVersion', '1.21.1')
 }
 
 dependencies {
@@ -73,14 +63,6 @@ dependencies {
     implementation 'software.amazon.awssdk:s3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    e2eTestImplementation 'org.springframework.boot:spring-boot-starter-test'
-    e2eTestImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder'
-    e2eTestImplementation 'org.springframework.kafka:spring-kafka-test'
-    e2eTestImplementation "org.testcontainers:testcontainers:${testcontainersVersion}"
-    e2eTestImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
-    e2eTestImplementation "org.testcontainers:kafka:${testcontainersVersion}"
-    e2eTestImplementation "org.awaitility:awaitility:4.3.0"
 }
 
 dependencyManagement {
@@ -89,17 +71,9 @@ dependencyManagement {
     }
 }
 
-tasks.register('e2eTest', Test) {
-    description = 'Runs end-to-end tests using Testcontainers.'
-    group = 'verification'
-    testClassesDirs = sourceSets.e2eTest.output.classesDirs
-    classpath = sourceSets.e2eTest.runtimeClasspath
-    useJUnitPlatform()
-    // e2e tests are not part of the default 'check' lifecycle
-}
-
 jar {
-    enabled = false
+    enabled = true
+    archiveClassifier = 'plain'
 }
 
 tasks.named('test') {

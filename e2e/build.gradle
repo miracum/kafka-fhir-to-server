@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springBootVersion', '4.0.2')
+    set('springCloudVersion', '2025.1.1')
+    set('hapiVersion', '8.6.5')
+    set('testcontainersVersion', '1.21.1')
+}
+
+dependencies {
+    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    testImplementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
+    testImplementation project(':')
+
+    testImplementation "ca.uhn.hapi.fhir:hapi-fhir-base:${hapiVersion}"
+    testImplementation "ca.uhn.hapi.fhir:hapi-fhir-client:${hapiVersion}"
+    testImplementation "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${hapiVersion}"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.cloud:spring-cloud-stream'
+    testImplementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation "org.testcontainers:testcontainers:${testcontainersVersion}"
+    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    testImplementation "org.testcontainers:kafka:${testcontainersVersion}"
+    testImplementation "org.awaitility:awaitility:4.3.0"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    // Only run e2e tests when this sub-project is explicitly targeted,
+    // e.g. ./gradlew :e2e:test
+    onlyIf { gradle.startParameter.taskNames.any { it.contains('e2e') } }
+}
