@@ -25,6 +25,7 @@ spring:
         max.poll.interval.ms: ${MAX_POLL_INTERVAL_MS:300000}
         max.request.size: ${MAX_REQUEST_SIZE:1048576}
         request.timeout.ms: ${REQUEST_TIMEOUT_MS:900000}
+        auto.offset.reset: earliest
   cloud:
     function:
       definition: sinkSingle

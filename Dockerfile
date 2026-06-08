@@ -6,9 +6,11 @@ COPY --chown=gradle:gradle . .
 
 RUN --mount=type=cache,target=/home/gradle/.gradle/caches <<EOF
 set -e
-gradle clean build --info
+gradle clean build
 gradle jacocoTestReport
-java -Djarmode=layertools -jar build/libs/*.jar extract
+PROJECT_VERSION="$(gradle --no-configuration-cache -q printVersion)"
+java -Djarmode=tools -jar "build/libs/fhir-to-server-${PROJECT_VERSION}.jar" extract \
+    --layers --launcher --destination ./layers
 EOF
 
 FROM scratch AS test
@@ -18,10 +20,10 @@ ENTRYPOINT [ "true" ]
 
 FROM gcr.io/distroless/java25-debian13:nonroot@sha256:e1eeec12952b877762d2a0a94a216600b34056942f6d82635a1d4a5dc8ee9770
 WORKDIR /opt/kafka-fhir-to-server
-COPY --from=build /home/gradle/project/dependencies/ ./
-COPY --from=build /home/gradle/project/spring-boot-loader/ ./
-COPY --from=build /home/gradle/project/snapshot-dependencies/ ./
-COPY --from=build /home/gradle/project/application/ ./
+COPY --from=build /home/gradle/project/layers/dependencies/ ./
+COPY --from=build /home/gradle/project/layers/spring-boot-loader/ ./
+COPY --from=build /home/gradle/project/layers/snapshot-dependencies/ ./
+COPY --from=build /home/gradle/project/layers/application/ ./
 
 USER 65532:65532
 EXPOSE 8080/tcp

@@ -1,5 +1,6 @@
 *
-!src
+!src/
+!e2e/
 !build.gradle
 !settings.gradle
 !gradle.properties

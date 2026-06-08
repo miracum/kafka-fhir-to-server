@@ -1,0 +1,94 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "Observation/id-6457799fed46dffc",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "id-6457799fed46dffc",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "74200-7",
+              "display": "Days in intensive care unit"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pid.1001"
+        },
+        "encounter": {
+          "reference": "Encounter/cid.108"
+        },
+        "valueQuantity": {
+          "value": 2,
+          "unit": "d",
+          "system": "http://unitsofmeasure.org",
+          "code": "d"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/id-6457799fed46dffc"
+      }
+    },
+    {
+      "fullUrl": "Patient/pid.1001",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pid.1001",
+        "meta": {
+          "source": "#p21"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR"
+                }
+              ]
+            },
+            "system": "https://miracum.org/fhir/NamingSystem/identifier/PatientId",
+            "value": "pid.1001"
+          }
+        ],
+        "birthDate": "1941-01-01"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient/pid.1001"
+      }
+    },
+    {
+      "fullUrl": "Encounter/cid.108",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "cid.108",
+        "meta": {
+          "source": "#p21"
+        },
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "reference": "Patient/pid.1001"
+        },
+        "period": {
+          "start": "2018-07-31T20:32:00+02:00"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/cid.108"
+      }
+    }
+  ]
+}

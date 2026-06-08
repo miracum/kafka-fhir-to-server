@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: fhir-to-server-e2e-test
+  kafka:
+    security.protocol: PLAINTEXT
+    consumer:
+      properties:
+        allow.auto.create.topics: true
+  cloud:
+    function:
+      definition: sinkSingle
+    stream:
+      bindings:
+        sinkSingle-in-0:
+          consumer:
+            concurrency: 1
+            batch-mode: false
+            use-native-decoding: true
+          group: fhir-to-server-e2e
+      kafka:
+        default:
+          consumer:
+            enableDlq: false
+        bindings:
+          sinkSingle-in-0:
+            consumer:
+              configuration:
+                value.deserializer: org.miracum.kafka.serializers.KafkaFhirDeserializer
+  main:
+    banner-mode: off
+
+fhir:
+  filter:
+    expression: ""
+  override-bundle-type-with: ""
+  url: ""
+  auth:
+    basic:
+      enabled: false
+      username: ""
+      password: ""
+  http-timeout-seconds: 60
+  merge-batches-into-single-bundle:
+    enabled: false
+    entry-uniqueness-fhirpath-expression: "request.url.toString()"
+
+s3:
+  enabled: false
+  endpoint-url: ""
+  access-key: ""
+  secret-key: ""
+  bucket-name: "fhir"
+  object-name-prefix: ""
+  region: "eu-central-1"
+  force-path-style: true
+  timeout-seconds: 120
+
+logging:
+  level:
+    org.miracum: DEBUG
+    org.springframework.cloud.stream: DEBUG
+    org.springframework.kafka: DEBUG

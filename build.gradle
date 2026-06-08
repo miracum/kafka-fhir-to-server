@@ -72,7 +72,8 @@ dependencyManagement {
 }
 
 jar {
-    enabled = false
+    enabled = true
+    archiveClassifier = 'plain'
 }
 
 tasks.named('test') {
@@ -96,5 +97,12 @@ spotless {
         importOrder()
         removeUnusedImports()
         googleJavaFormat()
+    }
+}
+
+// via <https://stackoverflow.com/questions/24936781/gradle-plugin-project-version-number>
+task printVersion {
+    doLast {
+        println project.version
     }
 }
