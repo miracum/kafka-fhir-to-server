@@ -25,11 +25,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
@@ -44,7 +44,7 @@ class FhirToServerE2eTest {
 
   @Container
   static final KafkaContainer kafka =
-      new KafkaContainer(DockerImageName.parse("apache/kafka:4.2.0")).withNetwork(network);
+      new KafkaContainer(DockerImageName.parse("docker.io/apache/kafka-native:4.3.0@sha256:169febaaa11b212435605b25f0654bd5aa6c07ed09d9efd61ae40c52d514c3a7")).withNetwork(network);
 
   @Container
   @SuppressWarnings("resource")
