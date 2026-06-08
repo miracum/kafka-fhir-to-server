@@ -1,6 +1,6 @@
 {
   "resourceType": "Bundle",
-  "type": "batch",
+  "type": "transaction",
   "entry": [
     {
       "fullUrl": "Patient/pid.999",

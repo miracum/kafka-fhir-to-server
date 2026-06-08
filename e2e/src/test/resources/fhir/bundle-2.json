@@ -1,15 +1,12 @@
 {
   "resourceType": "Bundle",
-  "type": "batch",
+  "type": "transaction",
   "entry": [
     {
       "fullUrl": "Observation/id-6457799fed46dffc",
       "resource": {
         "resourceType": "Observation",
         "id": "id-6457799fed46dffc",
-        "meta": {
-          "source": "#p21"
-        },
         "status": "final",
         "code": {
           "coding": [

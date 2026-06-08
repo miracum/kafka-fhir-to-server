@@ -58,3 +58,5 @@ s3:
 logging:
   level:
     org.miracum: DEBUG
+    org.springframework.cloud.stream: DEBUG
+    org.springframework.kafka: DEBUG
