@@ -54,7 +54,7 @@ jobs:
         uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
 
       - name: Run E2E tests
-        run: ./gradlew :e2e:test
+        run: ./gradlew :e2e:e2eTest
 
   lint:
     uses: miracum/.github/.github/workflows/standard-lint.yaml@602a4dd955cee8ab1e7e9c70761b5b4c9d678a95 # v1.21.4
