@@ -9,7 +9,7 @@ set -e
 gradle clean build
 gradle jacocoTestReport
 PROJECT_VERSION="$(gradle --no-configuration-cache -q printVersion)"
-java -Djarmode=tools -jar build/libs/fhir-to-server-${PROJECT_VERSION}.jar extract \
+java -Djarmode=tools -jar "build/libs/fhir-to-server-${PROJECT_VERSION}.jar" extract \
     --layers --launcher --destination ./layers
 EOF
 
