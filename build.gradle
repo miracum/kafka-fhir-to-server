@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '4.0.2'
+    id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'jacoco'
-    id 'com.diffplug.spotless' version '8.2.1'
+    id 'com.diffplug.spotless' version '8.5.1'
 }
 
 group = 'org.miracum.streams'
@@ -27,7 +27,7 @@ repositories {
 
 ext {
     set('springCloudVersion', '2025.1.1')
-    set('hapiVersion', '8.6.5')
+    set('hapiVersion', '8.10.0')
 }
 
 dependencies {
@@ -41,8 +41,8 @@ dependencies {
 
     implementation 'org.apache.kafka:kafka-streams'
 
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.3'
-    implementation 'io.micrometer:micrometer-core:1.16.3'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.5'
+    implementation 'io.micrometer:micrometer-core:1.16.5'
 
     implementation 'org.miracum:kafka-fhir-serializer:2.0.8'
 
@@ -55,11 +55,11 @@ dependencies {
     implementation "ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:${hapiVersion}"
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.21.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.21.3'
 
     implementation 'org.fhir:ucum:1.0.10'
 
-    implementation platform('software.amazon.awssdk:bom:2.41.31')
+    implementation platform('software.amazon.awssdk:bom:2.44.12')
     implementation 'software.amazon.awssdk:s3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
