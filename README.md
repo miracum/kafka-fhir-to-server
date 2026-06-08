@@ -81,6 +81,12 @@ docker compose up
 ./gradlew :bootRun
 ```
 
+### Run E2E Tests
+
+```sh
+./gradlew :e2e:e2eTest
+```
+
 ### Kubernetes
 
 #### Create a local KinD cluster

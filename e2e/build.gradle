@@ -41,8 +41,12 @@ dependencies {
 }
 
 tasks.named('test') {
+    enabled = false
+}
+
+tasks.register('e2eTest', Test) {
     useJUnitPlatform()
-    // Only run e2e tests when this sub-project is explicitly targeted,
-    // e.g. ./gradlew :e2e:test
-    onlyIf { gradle.startParameter.taskNames.any { it.contains('e2e') } }
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
 }
