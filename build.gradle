@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.miracum.streams'
-version = '3.0.17'
+version = '3.0.18'
 
 java {
   toolchain {
