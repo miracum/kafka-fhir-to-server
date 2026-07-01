@@ -13,8 +13,8 @@ repositories {
 }
 
 ext {
-    set('springBootVersion', '4.0.6')
-    set('springCloudVersion', '2025.1.1')
+    set('springBootVersion', '4.1.0')
+    set('springCloudVersion', '2025.1.2')
     set('hapiVersion', '8.10.0')
     set('testcontainersVersion', '1.21.3')
 }
