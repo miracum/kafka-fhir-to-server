@@ -46,14 +46,20 @@ public class Config {
   @Bean
   IGenericClient fhirClient(
       FhirContext fhirContext,
-      @Value("${fhir.auth.basic.username}") String username,
-      @Value("${fhir.auth.basic.password}") String password,
-      @Value("${fhir.auth.basic.enabled}") boolean isBasicAuthEnabled,
+      FhirAuthConfig authConfig,
       @Value("${fhir.url}") String fhirServerUrl) {
     var client = fhirContext.newRestfulGenericClient(fhirServerUrl);
 
-    if (isBasicAuthEnabled) {
-      client.registerInterceptor(new BasicAuthInterceptor(username, password));
+    if (authConfig.basic().enabled()) {
+      client.registerInterceptor(
+          new BasicAuthInterceptor(authConfig.basic().username(), authConfig.basic().password()));
+    } else if (authConfig.oauth2().enabled()) {
+      client.registerInterceptor(
+          new OAuth2ClientCredentialsAuthInterceptor(
+              authConfig.oauth2().tokenUrl(),
+              authConfig.oauth2().clientId(),
+              authConfig.oauth2().clientSecret(),
+              authConfig.oauth2().scope()));
     }
 
     return client;
