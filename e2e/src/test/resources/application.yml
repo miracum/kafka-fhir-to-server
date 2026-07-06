@@ -39,6 +39,12 @@ fhir:
       enabled: false
       username: ""
       password: ""
+    oauth2:
+      enabled: false
+      token-url: ""
+      client-id: ""
+      client-secret: ""
+      scope: ""
   http-timeout-seconds: 60
   merge-batches-into-single-bundle:
     enabled: false
