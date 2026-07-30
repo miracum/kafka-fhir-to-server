@@ -1,0 +1,18 @@
+{
+  "realm": "fhir-to-server",
+  "enabled": true,
+  "sslRequired": "none",
+  "clients": [
+    {
+      "clientId": "fhir-to-server-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "fhir-to-server-secret",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocol": "openid-connect"
+    }
+  ]
+}
