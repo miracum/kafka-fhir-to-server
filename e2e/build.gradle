@@ -49,4 +49,10 @@ tasks.register('e2eTest', Test) {
 
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
+
+    // allows CI to point the e2e tests at the image it just built instead of the last release.
+    def fhirToServerImage = System.getenv('FHIR_TO_SERVER_IMAGE')
+    if (fhirToServerImage) {
+        systemProperty 'fhirToServer.image', fhirToServerImage
+    }
 }
