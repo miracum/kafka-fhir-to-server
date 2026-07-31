@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   build:
-    uses: miracum/.github/.github/workflows/standard-build.yaml@602a4dd955cee8ab1e7e9c70761b5b4c9d678a95 # v1.21.4
+    uses: miracum/.github/.github/workflows/standard-build.yaml@56f97afca6189a2fafd4e5d7cbabc6c9b83c8a85 # v1.22.4
     permissions:
       contents: write
       id-token: write
@@ -29,6 +29,8 @@ jobs:
       pull-requests: write
       actions: read
       security-events: write
+      artifact-metadata: write
+      attestations: write
     with:
       enable-build-test-layer: false
       enable-upload-test-image: false
@@ -50,13 +52,13 @@ jobs:
           persist-credentials: false
 
       - name: Set up JDK
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
           distribution: temurin
           java-version: "25"
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       # the build job only pushes the image it built to ghcr.io if it isn't a PR from a fork,
       # since forks don't have registry credentials. In that case, the e2e tests fall back to
@@ -75,7 +77,7 @@ jobs:
         run: ./gradlew :e2e:e2eTest
 
   lint:
-    uses: miracum/.github/.github/workflows/standard-lint.yaml@602a4dd955cee8ab1e7e9c70761b5b4c9d678a95 # v1.21.4
+    uses: miracum/.github/.github/workflows/standard-lint.yaml@56f97afca6189a2fafd4e5d7cbabc6c9b83c8a85 # v1.22.4
     permissions:
       contents: read
       pull-requests: write
@@ -90,7 +92,7 @@ jobs:
       github-token: ${{ secrets.GITHUB_TOKEN }}
 
   release:
-    uses: miracum/.github/.github/workflows/standard-release.yaml@602a4dd955cee8ab1e7e9c70761b5b4c9d678a95 # v1.21.4
+    uses: miracum/.github/.github/workflows/standard-release.yaml@56f97afca6189a2fafd4e5d7cbabc6c9b83c8a85 # v1.22.4
     needs:
       - build
     permissions:
