@@ -7,6 +7,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
+import ca.uhn.fhir.rest.server.exceptions.PreconditionFailedException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import io.micrometer.core.instrument.Counter;
@@ -86,12 +87,18 @@ public class SendToServerProcessor {
   private static final DistributionSummary sendBundleSizeDistribution =
       Metrics.globalRegistry.summary("fhirtoserver.fhir.batch.bundle.size");
 
+  private static final Counter versionConflictCounter =
+      Metrics.globalRegistry.counter("fhirtoserver.fhir.preserve.elements.version.conflicts.total");
+
+  private static final int MAX_VERSION_CONFLICT_ATTEMPTS = 5;
+
   private final IGenericClient client;
   private final RetryTemplate retryTemplate;
   private final String fhirPathFilterExpression;
   private final Bundle.BundleType overrideBundleType;
   private final FhirPathResourceFilter resourceFilter;
   private final FhirBundleMerger fhirBundleMerger;
+  private final ExistingElementsPreserver existingElementsPreserver;
 
   private final FhirBundleMergerConfig batchMergingConfig;
 
@@ -105,6 +112,7 @@ public class SendToServerProcessor {
       FhirBundleMergerConfig batchMergingConfig,
       FhirPathResourceFilter resourceFilter,
       FhirBundleMerger fhirBundleMerger,
+      ExistingElementsPreserver existingElementsPreserver,
       S3Config s3Config,
       @Nullable S3BundleStore s3Store) {
     this.overrideBundleType = overrideBundleType;
@@ -113,6 +121,7 @@ public class SendToServerProcessor {
     this.resourceFilter = resourceFilter;
     this.client = fhirClient;
     this.fhirBundleMerger = fhirBundleMerger;
+    this.existingElementsPreserver = existingElementsPreserver;
     this.s3Config = s3Config;
     this.s3Store = s3Store;
 
@@ -314,13 +323,36 @@ public class SendToServerProcessor {
 
       var sendStartTime = System.nanoTime();
 
-      sendingDurationTimer.record(
-          () ->
-              retryTemplate.execute(context -> client.transaction().withBundle(bundle).execute()));
+      sendingDurationTimer.record(() -> retryTemplate.execute(context -> sendBundle(bundle)));
 
       var duration = System.nanoTime() - sendStartTime;
       var timePerBundleEntry = duration / bundleSize;
       sendingDurationNormalizedTimer.record(timePerBundleEntry, TimeUnit.NANOSECONDS);
+    }
+  }
+
+  private Bundle sendBundle(Bundle bundle) {
+    if (!existingElementsPreserver.isEnabled()) {
+      return client.transaction().withBundle(bundle).execute();
+    }
+
+    // a version conflict means a preserved resource was updated in between reading and writing it.
+    // Re-reading it and trying again keeps that update instead of overwriting it. Servers report a
+    // failed If-Match as either 412 (per the spec) or 409.
+    for (var attempt = 1; ; attempt++) {
+      var bundleToSend = existingElementsPreserver.preserve(bundle);
+      try {
+        return client.transaction().withBundle(bundleToSend).execute();
+      } catch (PreconditionFailedException | ResourceVersionConflictException e) {
+        versionConflictCounter.increment();
+        if (attempt >= MAX_VERSION_CONFLICT_ATTEMPTS) {
+          throw e;
+        }
+        LOG.warn(
+            "Version conflict while sending bundle with preserved elements. Re-reading and trying"
+                + " again. Attempt: {}.",
+            kv("attempt", attempt));
+      }
     }
   }
 }
