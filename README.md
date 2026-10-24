@@ -30,6 +30,7 @@ Published as `ghcr.io/miracum/kafka-fhir-to-server`.
 | `FHIR_MERGE_BATCHES_INTO_SINGLE_BUNDLE_ENABLED`                              | Enable merging bundles read as a batch from the input topic into a single topic composed of all individual resources.                                                                                                                   | `false`                    |
 | `FHIR_MERGE_BATCHES_INTO_SINGLE_BUNDLE_ENTRY_UNIQUENESS_FHIRPATH_EXPRESSION` | A FHIRPath expression evaluated against each bundle.entry. The resulting string represents the resource identity. If multiple entries have the same identity, only the one from the most recently received message is used.             | `"resource.id.toString()"` |
 | `FHIR_MERGE_BATCHES_INTO_SINGLE_BUNDLE_BUNDLE_MAX_SIZE`                      | If set, the bundles to be sent to the server are first partitioned into several bundles containing at most this settings resources. Useful if the potential total size of a merged bundle may exceed the limit supported by the server. | `null`                     |
+| `FHIR_PRESERVE_ELEMENTS`                                                     | `ResourceType.element` paths, comma-separated, to keep from the resource already on the server when a `PUT` entry doesn't set them itself. See [Preserving elements managed by another system](#preserving-elements-managed-by-another-system).                     | `""`                       |
 
 See [application.yml](src/main/resources/application.yml) for more options.
 
@@ -43,6 +44,40 @@ See [application.yml](src/main/resources/application.yml) for more options.
 | `S3_SECRET_KEY`         | The secret key. Can also be left empty to use the `AWS_SECRET_ACCESS_KEY` environment variable instead.                                                                                          | `""`     |
 | `S3_BUCKET_NAME`        | The name of the bucket to store the resources. The actual resources are grouped by their type and stored using the current epoch timestamp, e.g. `<S3_BUCKET_NAME>/Patient/bundle-123456.ndjson` | `"fhir"` |
 | `S3_OBJECT_NAME_PREFIX` | An optional prefix to prepend to the object name: `<S3_BUCKET_NAME><S3_OBJECT_NAME_PREFIX>Patient/bundle-123456.ndjson`                                                                          | `""`     |
+
+### Preserving elements managed by another system
+
+A `PUT` replaces the whole resource on the server. If another system adds elements to resources this service also sends,
+for example a study registry that sets `ResearchStudy.enrollment` on studies coming from an upstream ETL job, the next
+`PUT` from this service removes them again. `FHIR_PRESERVE_ELEMENTS` keeps these elements:
+
+```yaml
+FHIR_PRESERVE_ELEMENTS: "ResearchStudy.enrollment,Patient.generalPractitioner"
+```
+
+or, in an `application.yml`:
+
+```yaml
+fhir:
+  preserve-elements:
+    - ResearchStudy.enrollment
+    - Patient.generalPractitioner
+```
+
+Before sending a bundle, every `PUT` entry of a configured resource type is read from the server in a single `batch`
+request. Plain (`ResearchStudy/123`) and conditional (`ResearchStudy?identifier=...`) update urls are both supported.
+If the resource exists, each configured element that the incoming resource doesn't set itself is copied over from the
+server's version. Elements the incoming resource does set are sent as-is. The entry also gets an `If-Match` on the
+version that was read, so that an update made in between the read and the write isn't overwritten: on a version
+conflict (`409` or `412`), the bundle is re-read and sent again, up to 5 times.
+
+- The paths are plain element names, not FHIRPath expressions: only top-level elements of a resource are supported,
+  e.g. `ResearchStudy.enrollment` or `Patient.generalPractitioner`. Invalid paths fail at startup.
+- Configure it only on the deployment that sends to the server where the other system writes these elements. Without
+  it, no extra requests are made.
+- If reading a resource fails with anything but `404` or `410`, the bundle isn't sent, rather than risking overwriting the elements.
+- Retrying on version conflicts relies on the server failing the request, so it only works for `transaction` bundles.
+  In a `batch` bundle, a conflicting entry fails on its own and isn't retried.
 
 ### Self-Signed Certificates
 

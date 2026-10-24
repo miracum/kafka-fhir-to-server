@@ -33,6 +33,7 @@ fhir:
   filter:
     expression: ""
   override-bundle-type-with: ""
+  preserve-elements: []
   url: ""
   auth:
     basic:

@@ -88,6 +88,10 @@ fhir:
   filter:
     expression: ""
   override-bundle-type-with: ""
+  # -- "ResourceType.element" paths to keep from the existing resource on the server when a PUT
+  # entry doesn't set them itself, e.g. `- ResearchStudy.enrollment`. Can also be set as a
+  # comma-separated string, e.g. FHIR_PRESERVE_ELEMENTS="ResearchStudy.enrollment,Patient.link".
+  preserve-elements: []
   url: ""
   auth:
     basic:
