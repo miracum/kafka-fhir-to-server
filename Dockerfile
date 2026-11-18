@@ -18,7 +18,7 @@ WORKDIR /test
 COPY --from=build /home/gradle/project/build/reports/ .
 ENTRYPOINT [ "true" ]
 
-FROM gcr.io/distroless/java25-debian13:nonroot@sha256:a90a5fadd78dc37b643da72dca2f744ef67eba625eca7227a5b375b548e6b1c2
+FROM gcr.io/distroless/java25-debian13:nonroot@sha256:1c4ced761d17961c900cba60c33c8c3c46edbdadaa9d5ef9806eb5a6824fd406
 WORKDIR /opt/kafka-fhir-to-server
 COPY --from=build /home/gradle/project/layers/dependencies/ ./
 COPY --from=build /home/gradle/project/layers/spring-boot-loader/ ./
